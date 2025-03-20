@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'Views/home.dart';
+import 'Views/Home/home.dart';
 import 'Views/navigBottom.dart';
 import 'Views/view2.dart';
 import 'Views/view3.dart';
