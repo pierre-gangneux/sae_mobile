@@ -7,7 +7,6 @@ class ViewRestaurant extends StatelessWidget {
     return SizedBox(
       width: 250, // Fixe une largeur pour éviter les erreurs
       child: Card(
-        color: Colors.white,
         child: ListTile(
           title: Text("title"),
           subtitle: Text("ouvert"),

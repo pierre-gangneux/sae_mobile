@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:sae_mobile/Views/profilView.dart';
 import 'Views/Home/home.dart';
 import 'Views/navigBottom.dart';
-import 'Views/view2.dart';
-import 'Views/view3.dart';
+import 'Views/searchView.dart';
+import 'Views/mapView.dart';
 
 final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'root');
 final GlobalKey<NavigatorState> _sectionANavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'sectionANav');
@@ -31,7 +32,7 @@ class MyApp extends StatelessWidget{
               GoRoute(
                 // The screen to display as the root in the first tab of the
                 // bottom navigation bar.
-                path: '/Home',
+                path: '/home',
                 builder: (BuildContext context, GoRouterState state) => Home(),
               ),
             ],
@@ -44,8 +45,8 @@ class MyApp extends StatelessWidget{
               GoRoute(
                 // The screen to display as the root in the second tab of the
                 // bottom navigation bar.
-                path: '/route2',
-                builder: (BuildContext context, GoRouterState state) => View2(),
+                path: '/search',
+                builder: (BuildContext context, GoRouterState state) => SearchView(),
               ),
             ],
           ),
@@ -56,8 +57,20 @@ class MyApp extends StatelessWidget{
               GoRoute(
                 // The screen to display as the root in the third tab of the
                 // bottom navigation bar.
-                path: '/route3',
-                builder: (BuildContext context, GoRouterState state) => View3(),
+                path: '/map',
+                builder: (BuildContext context, GoRouterState state) => MapView(),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            // It's not necessary to provide a navigatorKey if it isn't also
+            // needed elsewhere. If not provided, a default key will be used.
+            routes: <RouteBase>[
+              GoRoute(
+                // The screen to display as the root in the second tab of the
+                // bottom navigation bar.
+                path: '/profile',
+                builder: (BuildContext context, GoRouterState state) => ProfilView(),
               ),
             ],
           ),
@@ -71,7 +84,13 @@ class MyApp extends StatelessWidget{
     return MaterialApp.router(
       title: 'Flutter Demo',
       theme: ThemeData(
-        primarySwatch: Colors.blue,
+        primarySwatch: Colors.blue, // Couleur principale de l'application
+        bottomNavigationBarTheme: BottomNavigationBarThemeData(
+          backgroundColor: Colors.white, // Fond blanc pour la barre de navigation
+          selectedItemColor: Colors.blue, // Couleur de l'icône sélectionnée
+          unselectedItemColor: Colors.grey, // Couleur des icônes non sélectionnées
+          elevation: 5, // Ajoute une légère ombre
+        ),
       ),
       routerConfig: _router,
     );
