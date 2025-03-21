@@ -17,6 +17,7 @@ class NavigBottom extends StatelessWidget {
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: "Accueil"),
           BottomNavigationBarItem(icon: Icon(Icons.search), label: "Recherche"),
+          BottomNavigationBarItem(icon: Icon(Icons.map), label: "Carte"),
           BottomNavigationBarItem(icon: Icon(Icons.person), label: "Profil"),
         ],
       ),
