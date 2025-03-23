@@ -9,40 +9,27 @@ class Home extends StatelessWidget {
         title: Text("IUTable"),
       ),
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: EdgeInsets.symmetric(horizontal: 16.0), // Ajoute de la marge à gauche et à droite
         child: Column(
-          children: [
-            // Liste horizontale des restaurants
-            Flexible(
-              flex: 2,
-              child: Column(
-                children: [
-                  Container(
-                    alignment: Alignment.centerLeft, // Alignement du texte à gauche
-                    child: Text("les mieux notés"),
-                  ),
-                  Expanded(child: ViewRestaurant()), //  Expanded Répartit bien la hauteur
-                  SizedBox(height: 20), // Espacement entre les éléments
-                ],
+            crossAxisAlignment: CrossAxisAlignment.start, // Aligne tout à gauche
+            children: [
+              Text(
+                "Recommander",
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  textAlign: TextAlign.left
               ),
-            ),
-            // Deuxième section
-            SizedBox(height: 50), // Espacement entre les éléments
-            Flexible(
-              flex: 1,
-              child: Container(
-                color: Colors.green,
-                child: Center(
-                  child: Text(
-                    "Ligne 2",
-                    style: TextStyle(color: Colors.white, fontSize: 20),
-                  ),
-                ),
+              Expanded(child: ViewRestaurant()),
+              // Deuxième section
+              SizedBox(height: 35), // Espacement entre les éléments
+              Text(
+                  "Récemment consulté",
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  textAlign: TextAlign.left
               ),
-            ),
-          ],
-        ),
+              Expanded(child: ViewRestaurant()),
+            ],
+          ),
       ),
-    );
+      );
   }
 }
