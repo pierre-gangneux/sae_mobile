@@ -91,6 +91,9 @@ class MyApp extends StatelessWidget{
           unselectedItemColor: Colors.grey, // Couleur des icônes non sélectionnées
           elevation: 5, // Ajoute une légère ombre
         ),
+        cardTheme: CardTheme(
+          color: Colors.grey[600], // Fond des cartes en gris foncé
+        ),
       ),
       routerConfig: _router,
     );

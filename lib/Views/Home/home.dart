@@ -23,17 +23,6 @@ class Home extends StatelessWidget {
                   ),
                   Expanded(child: ViewRestaurant()), //  Expanded Répartit bien la hauteur
                   SizedBox(height: 20), // Espacement entre les éléments
-                  Container(
-                    alignment: Alignment.centerLeft, // Alignement du texte à gauche
-                    child: Text("les mieux notés"),
-                  ),
-                  Expanded(child: ViewRestaurant()),
-                  SizedBox(height: 20), // Espacement entre les éléments
-                  Container(
-                    alignment: Alignment.centerLeft, // Alignement du texte à gauche
-                    child: Text("les mieux notés"),
-                  ),
-                  Expanded(child: ViewRestaurant()),
                 ],
               ),
             ),

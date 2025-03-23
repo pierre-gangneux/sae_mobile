@@ -3,9 +3,12 @@ import 'package:flutter/material.dart';
 class ViewRestaurant extends StatelessWidget {
   const ViewRestaurant({super.key});
 
-  Widget _restaurant2Widget() {
+  Widget _restaurant2Widget(BuildContext context) {
+    double screenWidth = MediaQuery.of(context).size.width;
+    double cardWidth = screenWidth * 0.8; // 80% de la largeur de l'écran
+
     return SizedBox(
-      width: 250, // Fixe une largeur pour éviter les erreurs
+      width: cardWidth.clamp(200, 400), // Min 200, Max 400 pour éviter des tailles extrêmes
       child: Card(
         child: ListTile(
           title: Text("title"),
@@ -24,7 +27,7 @@ class ViewRestaurant extends StatelessWidget {
         scrollDirection: Axis.horizontal, // Scroll horizontal
         itemCount: 10,
         itemBuilder: (context, index) {
-          return _restaurant2Widget();
+          return _restaurant2Widget(context);
         },
       ),
     );
