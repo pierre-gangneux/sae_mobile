@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-class ViewRestaurant extends StatelessWidget {
-  const ViewRestaurant({super.key});
+class ViewRestaurant2 extends StatelessWidget {
+  const ViewRestaurant2({super.key});
 
   Widget _restaurant2Widget(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
@@ -25,8 +25,8 @@ class ViewRestaurant extends StatelessWidget {
       height: 150, // Fixe une hauteur sinon ListView ne fonctionne pas bien
       child: ListView.builder(
 
-        scrollDirection: Axis.horizontal, // Scroll horizontal
-        itemCount: 10,
+        scrollDirection: Axis.vertical,
+        itemCount: 100,
         itemBuilder: (context, index) {
           return _restaurant2Widget(context);
         },
