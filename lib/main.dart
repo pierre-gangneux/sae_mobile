@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:sae_mobile/Views/profilView.dart';
+import 'package:sae_mobile/Views/Profil/connectionView.dart';
+import 'package:sae_mobile/Views/Profil/profilView.dart';
+import 'package:sae_mobile/Views/Profil/registerView.dart';
 import 'Views/Home/home.dart';
 import 'Views/navigBottom.dart';
 import 'Views/searchView.dart';
@@ -67,10 +69,30 @@ class MyApp extends StatelessWidget{
             // needed elsewhere. If not provided, a default key will be used.
             routes: <RouteBase>[
               GoRoute(
-                // The screen to display as the root in the second tab of the
-                // bottom navigation bar.
                 path: '/profile',
-                builder: (BuildContext context, GoRouterState state) => ProfilView(),
+                redirect: (BuildContext context, GoRouterState state) {
+                  if (state.fullPath == '/profile') {
+                    return '/profile/register';
+                  }
+                  return null;
+                },
+                routes: <RouteBase>[
+                  ShellRoute(
+                    builder: (BuildContext context, GoRouterState state, Widget child) {
+                      return ProfilView(child: child);
+                    },
+                    routes: [
+                      GoRoute(
+                        path: "register",
+                        builder: (BuildContext context, GoRouterState state) => RegisterView(),
+                      ),
+                      GoRoute(
+                        path: "connection",
+                        builder: (BuildContext context, GoRouterState state) => ConnectionView(),
+                      ),
+                    ],
+                  ),
+                ],
               ),
             ],
           ),

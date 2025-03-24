@@ -1,14 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 
 class ProfilView extends StatelessWidget {
+  final Widget child;
+
+  const ProfilView({super.key, required this.child});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("ProfilView")),
-      body: Center(
-          child: Text("ProfilView")
+      appBar: AppBar(
+        title: Text("Profil"),
       ),
+      body: child,
     );
   }
 }
