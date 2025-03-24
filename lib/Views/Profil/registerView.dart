@@ -14,6 +14,7 @@ class RegisterView extends StatefulWidget {
 class _RegisterViewState extends State<RegisterView> {
   final _formKey = GlobalKey<FormBuilderState>();
   bool _isPasswordHide = true;
+  bool _isConfirmHide = true;
   double _passwordStrength = 0;
   String _password = '';
 
@@ -44,11 +45,22 @@ class _RegisterViewState extends State<RegisterView> {
 
   String? passwordValidator(String? password) {
     if (password == null || password.isEmpty) {
-      return "Le mot de passe ne peut pas être vide";
+      return "Le mot de passe ne doit pas être vide";
     }
     double strength = getPasswordStrength(password);
     if (strength < 0.3) {
       return "Mot de passe trop faible";
+    }
+    return null;
+  }
+
+  String? confirmValidator(String? confirm) {
+    String password = _formKey.currentState?.fields['password']?.value;
+    if (confirm == null || confirm.isEmpty){
+      return "Le champ ne doit pas être vide";
+    }
+    if (password != confirm){
+      return "Le mot de passe n'est pas identique";
     }
     return null;
   }
@@ -72,19 +84,21 @@ class _RegisterViewState extends State<RegisterView> {
                 key: _formKey,
                 child: Column(
                   children: [
+                    // Username
                     FormBuilderTextField(
                       name: 'username',
                       decoration: const InputDecoration(labelText: "Nom d'utilisateur"),
                       validator: FormBuilderValidators.required(errorText: "Veuillez renseigner un nom d'utilisateur"),
                     ),
                     const SizedBox(height: 20),
+                    // Password
                     FormBuilderTextField(
                       name: 'password',
                       obscureText: _isPasswordHide,
                       decoration: InputDecoration(
                         labelText: 'Mot de passe',
                         suffixIcon: IconButton(
-                          icon: Icon(_isPasswordHide ? Icons.visibility : Icons.visibility_off),
+                          icon: Icon(_isPasswordHide ? Icons.visibility_off : Icons.visibility),
                           onPressed: () {
                             setState(() {
                               _isPasswordHide = !_isPasswordHide;
@@ -109,7 +123,7 @@ class _RegisterViewState extends State<RegisterView> {
                         color: getStrengthColor(_passwordStrength),
                         minHeight: 8,
                       ),
-                      const SizedBox(height: 5),
+                      const SizedBox(height: 2),
                       Text(
                         getStrengthText(_passwordStrength),
                         style: TextStyle(
@@ -117,7 +131,28 @@ class _RegisterViewState extends State<RegisterView> {
                           fontWeight: FontWeight.bold,
                         ),
                       ),
+                    ]
+                    else ...[
+                      const SizedBox(height: 30),
                     ],
+
+                    const SizedBox(height: 0),
+                    FormBuilderTextField(
+                      name: 'ConfirmPassword',
+                      obscureText: _isConfirmHide,
+                      decoration: InputDecoration(
+                        labelText: 'Confirmation du mot de passe',
+                        suffixIcon: IconButton(
+                          icon: Icon(_isConfirmHide ? Icons.visibility_off : Icons.visibility),
+                          onPressed: () {
+                            setState(() {
+                              _isConfirmHide = !_isConfirmHide;
+                            });
+                          },
+                        ),
+                      ),
+                      validator: confirmValidator,
+                    ),
                   ],
                 ),
               ),
@@ -127,6 +162,7 @@ class _RegisterViewState extends State<RegisterView> {
                   ElevatedButton(
                     onPressed: () {
                       if (_formKey.currentState!.validate()) {
+                        // Traiter le formulaire ICI
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
                             content: Text('Nouvel utilisateur : ${_formKey.currentState?.fields['username']?.value}'),

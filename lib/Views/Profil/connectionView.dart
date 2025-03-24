@@ -14,33 +14,6 @@ class ConnectionView extends StatefulWidget {
 class _ConnectionViewState extends State<ConnectionView> {
   final _formKey = GlobalKey<FormBuilderState>();
   bool _isPasswordHide = true;
-  double _passwordStrength = 0;
-  String _password = '';
-
-  double getPasswordStrength(String password) {
-    if (password.isEmpty) return 0.0;
-
-    int score = 0;
-    if (password.length >= 8) score++;
-    if (RegExp(r'[A-Z]').hasMatch(password)) score++;
-    if (RegExp(r'[a-z]').hasMatch(password)) score++;
-    if (RegExp(r'\d').hasMatch(password)) score++;
-    if (RegExp(r'[\W]').hasMatch(password)) score++;
-
-    return score / 5.0;
-  }
-
-  Color getStrengthColor(double strength) {
-    if (strength < 0.3) return Colors.red;
-    if (strength < 0.7) return Colors.orange;
-    return Colors.green;
-  }
-
-  String getStrengthText(double strength) {
-    if (strength < 0.3) return "Mot de passe faible";
-    if (strength < 0.7) return "Mot de passe moyen";
-    return "Mot de passe fort";
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -64,7 +37,7 @@ class _ConnectionViewState extends State<ConnectionView> {
                     FormBuilderTextField(
                       name: 'username',
                       decoration: const InputDecoration(labelText: "Nom d'utilisateur"),
-                      validator: FormBuilderValidators.required(errorText: "Veuillez renseigner un nom d'utilisateur"),
+                      validator: FormBuilderValidators.required(errorText: "Veuillez renseigner votre nom d'utilisateur"),
                     ),
                     const SizedBox(height: 20),
                     FormBuilderTextField(
@@ -81,35 +54,9 @@ class _ConnectionViewState extends State<ConnectionView> {
                           },
                         ),
                       ),
-                      onChanged: (value) {
-                        setState(() {
-                          _password = value ?? '';
-                          _passwordStrength = getPasswordStrength(_password);
-                        });
-                      },
-                      validator: FormBuilderValidators.compose([
-                        FormBuilderValidators.required(errorText: "Le champ est obligatoire"),
-                        FormBuilderValidators.minLength(8, errorText: 'Minimum 8 caractères'),
-                      ]),
+                      validator: FormBuilderValidators.required(errorText: "Le champ est obligatoire"),
                     ),
                     const SizedBox(height: 10),
-
-                    if (_password.isNotEmpty) ...[
-                      LinearProgressIndicator(
-                        value: _passwordStrength,
-                        backgroundColor: Colors.grey[300],
-                        color: getStrengthColor(_passwordStrength),
-                        minHeight: 8,
-                      ),
-                      const SizedBox(height: 5),
-                      Text(
-                        getStrengthText(_passwordStrength),
-                        style: TextStyle(
-                          color: getStrengthColor(_passwordStrength),
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
                   ],
                 ),
               ),
@@ -119,9 +66,10 @@ class _ConnectionViewState extends State<ConnectionView> {
                   ElevatedButton(
                     onPressed: () {
                       if (_formKey.currentState!.validate()) {
+                        // Traiter le formulaire ICI
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
-                            content: Text('Nouvel utilisateur : ${_formKey.currentState?.fields['username']?.value}'),
+                            content: Text('Connection utilisateur : ${_formKey.currentState?.fields['username']?.value}'),
                           ),
                         );
                       }
