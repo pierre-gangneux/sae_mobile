@@ -29,7 +29,7 @@ void main() async {
 
   runApp(
       ChangeNotifierProvider(
-        create: (context) => RestaurantViewModel(),
+        create: (context) => RestaurantViewModel(database),
         child: MyApp(database),
       )
   );
