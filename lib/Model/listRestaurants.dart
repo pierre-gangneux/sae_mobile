@@ -79,12 +79,13 @@ class ListRestaurants{
   }
 
 
-  void setRestaurantFiltre(String? nomRestau, String? categorie) {
+  void setRestaurantFiltre(String? nomRestau, String? categorie, List<String>options) {
     List<Restaurant> res = [];
     for (Restaurant restau in _lesRestaurants) {
       if (
       (nomRestau == null || restau.nomRestaurant.toLowerCase().contains(nomRestau.toLowerCase()))
       && (categorie == null || sameCategorie(categorie, restau.type))
+      && (optionPresent(restau, options))
       ) {
         res.add(restau);
       }
@@ -103,7 +104,20 @@ class ListRestaurants{
       return true;
     }
     return false;
-
   }
+
+  bool optionPresent(Restaurant restau, List<String> options) {
+    if (options.contains("vegetarien") && (restau.vegetarien != true)) return false;
+    if (options.contains("vegan") && (restau.vegan != true)) return false;
+    if (options.contains("espaceFumeur") && (restau.espaceFumeur != true)) return false;
+    if (options.contains("livraison") && (restau.livraison != true)) return false;
+    if (options.contains("aEmporter") && (restau.aEmporter != true)) return false;
+    if (options.contains("drive") && (restau.drive != true)) return false;
+    if (options.contains("accessInternet") && (restau.accessInternet != true)) return false;
+    if (options.contains("fauteuilRoulant") && (restau.fauteuilRoulant != true)) return false;
+
+    return true; // Si aucune condition n'a retourné false, alors toutes les options sont respectées.
+  }
+
 
 }

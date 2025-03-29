@@ -32,8 +32,8 @@ class RestaurantViewModel extends ChangeNotifier{
     return listeRestaux.currentRestaurants;
   }
 
-  void setRestaurantFiltre(String? nomRestau, String? categorie){
-    listeRestaux.setRestaurantFiltre(nomRestau, categorie);
+  void setRestaurantFiltre(String? nomRestau, String? categorie, List<String> options){
+    listeRestaux.setRestaurantFiltre(nomRestau, categorie, options);
     notifyListeners();
   }
 

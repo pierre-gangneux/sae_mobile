@@ -38,60 +38,43 @@ class _SearchViewState extends State<SearchView> {
                     ),
                   ),
                   SizedBox(height: 20),
-
-                  // Aligner les 3 FormBuilderDropdown horizontalement
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Expanded(
-                        child: FormBuilderDropdown(
-                          name: 'categorie',
-                          decoration: InputDecoration(
-                            labelText: "Catégorie",
-                            border: OutlineInputBorder(),
-                          ),
-                          items: ['Restaurant', 'Café', 'Bar', 'Pub', 'Fast food'].map((option) {
-                            return DropdownMenuItem(
-                              value: option,
-                              child: Text(option),
-                            );
-                          }).toList(),
-                        ),
-                      ),
-                      SizedBox(width: 10), // Espace entre les deux Dropdowns
-                      Expanded(
-                        child: FormBuilderDropdown(
-                          name: 'prix',
-                          decoration: InputDecoration(
-                            labelText: "Prix",
-                            border: OutlineInputBorder(),
-                          ),
-                          items: ['€', '€€', '€€€'].map((option) {
-                            return DropdownMenuItem(
-                              value: option,
-                              child: Text(option),
-                            );
-                          }).toList(),
-                        ),
-                      ),
-                      SizedBox(width: 10),
-                      Expanded(
-                        child: FormBuilderDropdown(
-                          name: 'note',
-                          decoration: InputDecoration(
-                            labelText: "Note",
-                            border: OutlineInputBorder(),
-                          ),
-                          items: ['⭐', '⭐⭐', '⭐⭐⭐', '⭐⭐⭐⭐', '⭐⭐⭐⭐⭐'].map((option) {
-                            return DropdownMenuItem(
-                              value: option,
-                              child: Text(option),
-                            );
-                          }).toList(),
-                        ),
-                      ),
-                    ],
+                  FormBuilderDropdown(
+                    name: 'categorie',
+                    decoration: InputDecoration(
+                      labelText: "Catégorie",
+                      border: OutlineInputBorder(),
+                    ),
+                    items: ['Restaurant', 'Café', 'Bar', 'Pub', 'Fast food'].map((option) {
+                      return DropdownMenuItem(
+                        value: option,
+                        child: Text(option),
+                      );
+                    }).toList(),
                   ),
+                  SizedBox(height: 20), // Espace entre les deux Dropdowns
+                  FormBuilderFilterChips(
+                    name: 'options',
+                    decoration: InputDecoration(
+                      labelText: "Options",
+                      border: OutlineInputBorder(),
+                    ),
+                    options: [
+                      FormBuilderChipOption(value: 'vegetarien', child: Text('Végétarien')),
+                      FormBuilderChipOption(value: 'vegan', child: Text('Vegan')),
+                      FormBuilderChipOption(value: 'espaceFumeur', child: Text('Fumeur')),
+                      FormBuilderChipOption(value: 'livraison', child: Text('Livraison')),
+                      FormBuilderChipOption(value: 'aEmporter', child: Text('À emporter')),
+                      FormBuilderChipOption(value: 'drive', child: Text('Drive')),
+                      FormBuilderChipOption(value: 'accessInternet', child: Text('Accès Internet')),
+                      FormBuilderChipOption(value: 'fauteuilRoulant', child: Text('Fauteuil roulant')),
+                    ],
+                    alignment: WrapAlignment.start, // Alignement au début
+
+                    runSpacing: 12.0, // Espacement vertical entre les lignes
+                    spacing : 30, // Espacement horizontal
+                    crossAxisAlignment: WrapCrossAlignment.start, // Pour éviter l'effet "compressé"
+                  ),
+
                   SizedBox(height: 20),
 
                   ElevatedButton(
@@ -99,7 +82,7 @@ class _SearchViewState extends State<SearchView> {
                       if (_formKey.currentState!.saveAndValidate()) {
                         print("Valeurs sélectionnées : ${_formKey.currentState!.value}");
                         var value = _formKey.currentState!.value;
-                        context.read<RestaurantViewModel>().setRestaurantFiltre(value["search"], value["categorie"]);
+                        context.read<RestaurantViewModel>().setRestaurantFiltre(value["search"], value["categorie"], value["options"]);
                       }
                     },
                     child: Text("Filtrer"),
