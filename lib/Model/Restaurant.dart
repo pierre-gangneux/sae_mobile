@@ -62,4 +62,27 @@ class Restaurant {
 
   String? get getLongitude => longitude;
   String? get getLatitude => latitude;
+
+
+  static List<Restaurant> generateRestaurant(int i){
+    List<Restaurant> restaurants=[];
+    for(int n=0;n<i;n++){
+      restaurants.add(
+          Restaurant(
+            osmid: n.toString(),
+            nomRestaurant: "Restaurant Exemple",
+            etoiles: 5,
+            telephone: "0102030405",
+            siteInternet: "https://www.restaurantexemple.com",
+            facebook: "https://www.facebook.com/restaurantexemple",
+            vegetarien: "yes",
+            vegan: "no",
+            livraison: "yes",
+            latitude: "48.8566",
+            longitude: "2.3522",
+          )
+      );
+    }
+    return restaurants;
+  }
 }
