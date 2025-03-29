@@ -50,7 +50,7 @@ class _SearchViewState extends State<SearchView> {
                             labelText: "Catégorie",
                             border: OutlineInputBorder(),
                           ),
-                          items: ['Restaurant', 'Café', 'Bar'].map((option) {
+                          items: ['Restaurant', 'Café', 'Bar', 'Pub', 'Fast food'].map((option) {
                             return DropdownMenuItem(
                               value: option,
                               child: Text(option),
@@ -98,7 +98,8 @@ class _SearchViewState extends State<SearchView> {
                     onPressed: () {
                       if (_formKey.currentState!.saveAndValidate()) {
                         print("Valeurs sélectionnées : ${_formKey.currentState!.value}");
-                        context.read<RestaurantViewModel>().setRestaurantFiltre(_formKey.currentState!.value["search"]);
+                        var value = _formKey.currentState!.value;
+                        context.read<RestaurantViewModel>().setRestaurantFiltre(value["search"], value["categorie"]);
                       }
                     },
                     child: Text("Filtrer"),

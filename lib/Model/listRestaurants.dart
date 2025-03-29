@@ -23,6 +23,7 @@ class ListRestaurants{
       return Restaurant(
         osmid: row['osmid'],
         nomRestaurant: row['nomrestaurant'],
+        type: row["type"],
         etoiles: row['etoiles'] ?? 0,
         telephone: row['telephone'],
         siret: row['siret'],
@@ -53,6 +54,7 @@ class ListRestaurants{
         Restaurant(
           osmid: n.toString(),
           nomRestaurant: "Restaurant Exemple",
+          type: "Restaurant",
           etoiles: 5,
           telephone: "0102030405",
           siteInternet: "https://www.restaurantexemple.com",
@@ -77,16 +79,31 @@ class ListRestaurants{
   }
 
 
-  void setRestaurantFiltre(String nomRestau) {
+  void setRestaurantFiltre(String? nomRestau, String? categorie) {
     List<Restaurant> res = [];
     for (Restaurant restau in _lesRestaurants) {
-      if (restau.nomRestaurant.toLowerCase().contains(nomRestau.toLowerCase())) {
+      if (
+      (nomRestau == null || restau.nomRestaurant.toLowerCase().contains(nomRestau.toLowerCase()))
+      && (categorie == null || sameCategorie(categorie, restau.type))
+      ) {
         res.add(restau);
       }
     }
     _currentRestaurants = res;
   }
 
+  bool sameCategorie(String viewCat, String  modType){
+    if (viewCat.toLowerCase() == modType.toLowerCase()){
+      return true;
+    }
+    else if(
+      (modType == "cafe" && viewCat == "Café")
+      || (modType == "fast_food" && viewCat == "Fast_food")
+    ){
+      return true;
+    }
+    return false;
 
+  }
 
 }
