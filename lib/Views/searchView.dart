@@ -98,6 +98,7 @@ class _SearchViewState extends State<SearchView> {
                     onPressed: () {
                       if (_formKey.currentState!.saveAndValidate()) {
                         print("Valeurs sélectionnées : ${_formKey.currentState!.value}");
+                        context.read<RestaurantViewModel>().setRestaurantFiltre(_formKey.currentState!.value["search"]);
                       }
                     },
                     child: Text("Filtrer"),
@@ -106,7 +107,7 @@ class _SearchViewState extends State<SearchView> {
               ),
             ),
           ),
-          Expanded(child: ViewRestaurant(axis: Axis.vertical, restaurants: context.watch<RestaurantViewModel>().liste,)),
+          Expanded(child: ViewRestaurant(axis: Axis.vertical, restaurants: context.watch<RestaurantViewModel>().getRestaurants(),)),
         ],
       ),
     );

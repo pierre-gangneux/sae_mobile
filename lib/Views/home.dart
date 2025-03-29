@@ -21,7 +21,7 @@ class Home extends StatelessWidget {
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                   textAlign: TextAlign.left
               ),
-              Expanded(child: ViewRestaurant(axis: Axis.horizontal, restaurants: context.watch<RestaurantViewModel>().liste)),
+              Expanded(child: ViewRestaurant(axis: Axis.horizontal, restaurants: context.watch<RestaurantViewModel>().getRestaurants())),
               // Deuxième section
               SizedBox(height: 35), // Espacement entre les éléments
               Text(
@@ -29,7 +29,7 @@ class Home extends StatelessWidget {
                   style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                   textAlign: TextAlign.left
               ),
-              Expanded(child: ViewRestaurant(axis: Axis.horizontal, restaurants: context.watch<RestaurantViewModel>().liste)),
+              Expanded(child: ViewRestaurant(axis: Axis.horizontal, restaurants: context.watch<RestaurantViewModel>().getRestaurants())),
             ],
           ),
       ),
