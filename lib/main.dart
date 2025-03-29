@@ -1,17 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 import 'package:sae_mobile/Views/profilView.dart';
 import 'Views/home.dart';
 import 'Views/navigBottom.dart';
 import 'Views/restaurantDetailView.dart';
 import 'Views/searchView.dart';
 import 'Views/mapView.dart';
+import 'ViewModels/restaurantViewModel.dart';
 
 final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'root');
 final GlobalKey<NavigatorState> _sectionANavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'sectionANav');
 
+
 void main() {
-  runApp(MyApp());
+  runApp(
+    ChangeNotifierProvider(
+      create: (context) => RestaurantViewModel(),
+      child: MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget{
@@ -53,7 +61,17 @@ class MyApp extends StatelessWidget{
                       path: ':id', // Chemin enfant dynamique pour le détail du restaurant
                       builder: (BuildContext context, GoRouterState state) {
                         final String restaurantId = state.pathParameters['id']!;
-                        return RestaurantDetailView(restaurantId: restaurantId);
+                        // Récupérer l'objet Restaurant en fonction de l'ID via Provider
+                        final restaurantViewModel = Provider.of<RestaurantViewModel>(context);
+                        final restaurant = restaurantViewModel.getRestaurantById(restaurantId);
+
+                        if (restaurant == null) {
+                          return Scaffold(body: Center(child: Text('Restaurant non trouvé')));
+                        }
+
+                        // Passer l'objet Restaurant au widget RestaurantDetailView
+                        return RestaurantDetailView(restaurant: restaurant);
+
                       },
                     ),
                   ],

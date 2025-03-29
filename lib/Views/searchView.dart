@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
+import 'package:provider/provider.dart';
 import 'package:sae_mobile/Views/viewRestaurant.dart';
+
+import '../ViewModels/restaurantViewModel.dart';
 
 class SearchView extends StatefulWidget {
   @override
@@ -103,7 +106,7 @@ class _SearchViewState extends State<SearchView> {
               ),
             ),
           ),
-          Expanded(child: ViewRestaurant(axis: Axis.vertical)),
+          Expanded(child: ViewRestaurant(axis: Axis.vertical, restaurants: context.watch<RestaurantViewModel>().liste,)),
         ],
       ),
     );

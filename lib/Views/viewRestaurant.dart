@@ -1,30 +1,35 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import '../Model/Restaurant.dart'; // Assurez-vous que le chemin est correct.
 
 class ViewRestaurant extends StatelessWidget {
-  final Axis axis; // Store the axis parameter
+  final Axis axis; // Propriété pour définir l'axe de défilement
+  final List<Restaurant> _restaurants; // Liste des restaurants
 
-  const ViewRestaurant({super.key, required this.axis}); // Proper constructor
+  ViewRestaurant({
+    super.key,
+    required this.axis,
+    required List<Restaurant> restaurants,
+  }) : _restaurants = restaurants;
 
-  Widget _restaurant2Widget(BuildContext context, String id) {
-    double screenWidth = MediaQuery
-        .of(context)
-        .size
-        .width;
-    double cardWidth = screenWidth * 0.8; // 80% of screen width
+
+  // Méthode pour afficher chaque carte de restaurant
+  Widget _restaurantCard(BuildContext context, Restaurant restaurant) {
+    double screenWidth = MediaQuery.of(context).size.width;
+    double cardWidth = screenWidth * 0.8; // 80% de la largeur de l'écran
 
     return SizedBox(
-      width: cardWidth.clamp(200, 400),
-      // Min 200, Max 400 to avoid extreme sizes
+      width: cardWidth.clamp(200, 400), // Largeur entre 200 et 400 pour éviter les tailles extrêmes
       child: Card(
-        child: InkWell( // Makes the whole card tappable with ripple effect
+        child: InkWell(
           onTap: () {
-            context.push('/restaurants/$id');
+            // Navigation vers la page de détails du restaurant via son ID
+            context.push('/restaurants/${restaurant.osmid}');
           },
           child: ListTile(
-            title: Text("title"),
-            subtitle: Text("ouvert"),
-            trailing: Text('Note'),
+            title: Text(restaurant.nomRestaurant),
+            subtitle: Text("Statut: ${restaurant.telephone ?? 'Non précisé'}"),
+            trailing: Text('${restaurant.etoiles} étoiles'),
           ),
         ),
       ),
@@ -34,15 +39,14 @@ class ViewRestaurant extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 150, // Fixed height for ListView to work properly
+      height: 150, // Hauteur fixe pour que le ListView fonctionne correctement
       child: ListView.builder(
-        scrollDirection: axis, // Use class-level property
-        itemCount: 100,
+        scrollDirection: axis, // Utilisation de la propriété de classe pour l'axe de défilement
+        itemCount: _restaurants.length, // Nombre d'éléments dans la liste de restaurants
         itemBuilder: (context, index) {
-          return _restaurant2Widget(context, "1");
+          return _restaurantCard(context, _restaurants[index]);
         },
       ),
     );
   }
-
 }
