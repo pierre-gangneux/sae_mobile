@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:sae_mobile/Views/viewRestaurants.dart';
+import 'package:sae_mobile/Views/viewRestaurant.dart';
 
 class Home extends StatelessWidget {
   @override
@@ -18,7 +18,7 @@ class Home extends StatelessWidget {
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                   textAlign: TextAlign.left
               ),
-              Expanded(child: ViewRestaurants(axis: Axis.horizontal)),
+              Expanded(child: ViewRestaurant(axis: Axis.horizontal)),
               // Deuxième section
               SizedBox(height: 35), // Espacement entre les éléments
               Text(
@@ -26,7 +26,7 @@ class Home extends StatelessWidget {
                   style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                   textAlign: TextAlign.left
               ),
-              Expanded(child: ViewRestaurants(axis: Axis.horizontal)),
+              Expanded(child: ViewRestaurant(axis: Axis.horizontal)),
             ],
           ),
       ),

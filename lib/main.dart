@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:sae_mobile/Views/profilView.dart';
 import 'Views/home.dart';
 import 'Views/navigBottom.dart';
+import 'Views/restaurantDetailView.dart';
 import 'Views/searchView.dart';
 import 'Views/mapView.dart';
 
@@ -45,9 +46,18 @@ class MyApp extends StatelessWidget{
               GoRoute(
                 // The screen to display as the root in the second tab of the
                 // bottom navigation bar.
-                path: '/search',
+                path: '/restaurants',
                 builder: (BuildContext context, GoRouterState state) => SearchView(),
-              ),
+                routes: [
+                  GoRoute(
+                      path: ':id', // Chemin enfant dynamique pour le détail du restaurant
+                      builder: (BuildContext context, GoRouterState state) {
+                        final String restaurantId = state.pathParameters['id']!;
+                        return RestaurantDetailView(restaurantId: restaurantId);
+                      },
+                    ),
+                  ],
+                ),
             ],
           ),
 
@@ -94,8 +104,18 @@ class MyApp extends StatelessWidget{
         cardTheme: CardTheme(
           color: Colors.grey[600], // Fond des cartes en gris foncé
         ),
+        appBarTheme: AppBarTheme(
+          backgroundColor: Colors.blue, // Fond bleu pour l'AppBar
+          elevation: 0, // Tu peux ajuster l'élévation si nécessaire
+          titleTextStyle: TextStyle(
+            color: Colors.white, // Couleur du texte de l'AppBar
+            fontSize: 20, // Taille de police du titre
+          ),
+        ),
       ),
+
       routerConfig: _router,
     );
   }
 }
+
