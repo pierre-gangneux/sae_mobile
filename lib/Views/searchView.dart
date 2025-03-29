@@ -38,44 +38,54 @@ class _SearchViewState extends State<SearchView> {
                     ),
                   ),
                   SizedBox(height: 20),
-                  FormBuilderDropdown(
-                    name: 'categorie',
-                    decoration: InputDecoration(
-                      labelText: "Catégorie",
-                      border: OutlineInputBorder(),
-                    ),
-                    items: ['Restaurant', 'Café', 'Bar', 'Pub', 'Fast food'].map((option) {
-                      return DropdownMenuItem(
-                        value: option,
-                        child: Text(option),
-                      );
-                    }).toList(),
-                  ),
-                  SizedBox(height: 20), // Espace entre les deux Dropdowns
-                  FormBuilderFilterChips(
-                    name: 'options',
-                    decoration: InputDecoration(
-                      labelText: "Options",
-                      border: OutlineInputBorder(),
-                    ),
-                    options: [
-                      FormBuilderChipOption(value: 'vegetarien', child: Text('Végétarien')),
-                      FormBuilderChipOption(value: 'vegan', child: Text('Vegan')),
-                      FormBuilderChipOption(value: 'espaceFumeur', child: Text('Fumeur')),
-                      FormBuilderChipOption(value: 'livraison', child: Text('Livraison')),
-                      FormBuilderChipOption(value: 'aEmporter', child: Text('À emporter')),
-                      FormBuilderChipOption(value: 'drive', child: Text('Drive')),
-                      FormBuilderChipOption(value: 'accessInternet', child: Text('Accès Internet')),
-                      FormBuilderChipOption(value: 'fauteuilRoulant', child: Text('Fauteuil roulant')),
+                  ExpansionTile(
+                    title: Text("Filtres"),
+                    initiallyExpanded: false, // Filtres fermés par défaut
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(10.0),
+                        child: Column(
+                          children: [
+                            FormBuilderDropdown(
+                              name: 'categorie',
+                              decoration: InputDecoration(
+                                labelText: "Catégorie",
+                                border: OutlineInputBorder(),
+                              ),
+                              items: ['','Restaurant', 'Café', 'Bar', 'Pub', 'Fast food'].map((option) {
+                                return DropdownMenuItem(
+                                  value: option,
+                                  child: Text(option),
+                                );
+                              }).toList(),
+                            ),
+                            SizedBox(height: 20),
+                            FormBuilderFilterChips(
+                              name: 'options',
+                              decoration: InputDecoration(
+                                labelText: "Options",
+                                border: OutlineInputBorder(),
+                              ),
+                              options: [
+                                FormBuilderChipOption(value: 'vegetarien', child: Text('Végétarien')),
+                                FormBuilderChipOption(value: 'vegan', child: Text('Vegan')),
+                                FormBuilderChipOption(value: 'espaceFumeur', child: Text('Fumeur')),
+                                FormBuilderChipOption(value: 'livraison', child: Text('Livraison')),
+                                FormBuilderChipOption(value: 'aEmporter', child: Text('À emporter')),
+                                FormBuilderChipOption(value: 'drive', child: Text('Drive')),
+                                FormBuilderChipOption(value: 'accessInternet', child: Text('Accès Internet')),
+                                FormBuilderChipOption(value: 'fauteuilRoulant', child: Text('Fauteuil roulant')),
+                              ],
+                              alignment: WrapAlignment.start,
+                              runSpacing: 12.0,
+                              spacing: 30.0,
+                              crossAxisAlignment: WrapCrossAlignment.start,
+                            ),
+                          ],
+                        ),
+                      ),
                     ],
-                    alignment: WrapAlignment.start, // Alignement au début
-
-                    runSpacing: 12.0, // Espacement vertical entre les lignes
-                    spacing : 30, // Espacement horizontal
-                    crossAxisAlignment: WrapCrossAlignment.start, // Pour éviter l'effet "compressé"
                   ),
-
-                  SizedBox(height: 20),
 
                   ElevatedButton(
                     onPressed: () {

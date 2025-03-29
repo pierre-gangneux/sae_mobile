@@ -79,13 +79,13 @@ class ListRestaurants{
   }
 
 
-  void setRestaurantFiltre(String? nomRestau, String? categorie, List<String>options) {
+  void setRestaurantFiltre(String? nomRestau, String? categorie, List<String>?options) {
     List<Restaurant> res = [];
     for (Restaurant restau in _lesRestaurants) {
       if (
       (nomRestau == null || restau.nomRestaurant.toLowerCase().contains(nomRestau.toLowerCase()))
       && (categorie == null || sameCategorie(categorie, restau.type))
-      && (optionPresent(restau, options))
+      && (options == null || optionPresent(restau, options))
       ) {
         res.add(restau);
       }
@@ -100,6 +100,7 @@ class ListRestaurants{
     else if(
       (modType == "cafe" && viewCat == "Café")
       || (modType == "fast_food" && viewCat == "Fast_food")
+      || viewCat == ""
     ){
       return true;
     }
