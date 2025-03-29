@@ -24,7 +24,7 @@ void main() async {
   }
 
   // Appeler la fonction pour initialiser la base de données
-  final database = await initDatabase();
+  final database = await populateDatabase();
 
   runApp(MyApp(database));
 }
