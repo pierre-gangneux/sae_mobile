@@ -1,55 +1,64 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:sae_mobile/Views/profilView.dart';
+import 'package:sqflite/sqflite.dart';
+import 'package:sqflite_common_ffi_web/sqflite_ffi_web.dart';  
 import 'Views/home.dart';
 import 'Views/navigBottom.dart';
 import 'Views/restaurantDetailView.dart';
 import 'Views/searchView.dart';
 import 'Views/mapView.dart';
+import 'database.dart';
 import 'ViewModels/restaurantViewModel.dart';
 
 final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'root');
 final GlobalKey<NavigatorState> _sectionANavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'sectionANav');
 
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  // Initialisation de databaseFactory pour le Web
+  if (kIsWeb) {
+    databaseFactory = databaseFactoryFfiWeb;  // Initialisation de databaseFactory pour le Web
+  }
+  // Appeler la fonction pour initialiser la base de données
+  final database = await populateDatabase();
+
   runApp(
-    ChangeNotifierProvider(
-      create: (context) => RestaurantViewModel(),
-      child: MyApp(),
-    ),
+      ChangeNotifierProvider(
+        create: (context) => RestaurantViewModel(),
+        child: MyApp(database),
+      )
   );
 }
 
-class MyApp extends StatelessWidget{
+class MyApp extends StatelessWidget {
+  final Database? database;
+  MyApp(this.database, {super.key});
+
   final GoRouter _router = GoRouter(
     navigatorKey: _rootNavigatorKey,
     initialLocation: '/home',
     routes: <RouteBase>[
-      // #docregion configuration-builder
       StatefulShellRoute.indexedStack(
         builder: (BuildContext context, GoRouterState state,
             StatefulNavigationShell navigationShell) {
           return NavigBottom(navigationShell: navigationShell);
         },
         branches: <StatefulShellBranch>[
-          // The route branch for the first tab of the bottom navigation bar.
           StatefulShellBranch(
             navigatorKey: _sectionANavigatorKey,
             routes: <RouteBase>[
               GoRoute(
-                // The screen to display as the root in the first tab of the
-                // bottom navigation bar.
                 path: '/home',
                 builder: (BuildContext context, GoRouterState state) => Home(),
               ),
             ],
           ),
-          // The route branch for the second tab of the bottom navigation bar.
           StatefulShellBranch(
-            // It's not necessary to provide a navigatorKey if it isn't also
-            // needed elsewhere. If not provided, a default key will be used.
             routes: <RouteBase>[
               GoRoute(
                 // The screen to display as the root in the second tab of the
@@ -78,25 +87,17 @@ class MyApp extends StatelessWidget{
                 ),
             ],
           ),
-
-          // The route branch for the third tab of the bottom navigation bar.
           StatefulShellBranch(
             routes: <RouteBase>[
               GoRoute(
-                // The screen to display as the root in the third tab of the
-                // bottom navigation bar.
                 path: '/map',
                 builder: (BuildContext context, GoRouterState state) => MapView(),
               ),
             ],
           ),
           StatefulShellBranch(
-            // It's not necessary to provide a navigatorKey if it isn't also
-            // needed elsewhere. If not provided, a default key will be used.
             routes: <RouteBase>[
               GoRoute(
-                // The screen to display as the root in the second tab of the
-                // bottom navigation bar.
                 path: '/profile',
                 builder: (BuildContext context, GoRouterState state) => ProfilView(),
               ),
@@ -107,20 +108,21 @@ class MyApp extends StatelessWidget{
     ],
   );
 
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp.router(
       title: 'Flutter Demo',
       theme: ThemeData(
-        primarySwatch: Colors.blue, // Couleur principale de l'application
-        bottomNavigationBarTheme: BottomNavigationBarThemeData(
-          backgroundColor: Colors.white, // Fond blanc pour la barre de navigation
-          selectedItemColor: Colors.blue, // Couleur de l'icône sélectionnée
-          unselectedItemColor: Colors.grey, // Couleur des icônes non sélectionnées
-          elevation: 5, // Ajoute une légère ombre
+        primarySwatch: Colors.blue,
+        bottomNavigationBarTheme: const BottomNavigationBarThemeData(
+          backgroundColor: Colors.white,
+          selectedItemColor: Colors.blue,
+          unselectedItemColor: Colors.grey,
+          elevation: 5,
         ),
         cardTheme: CardTheme(
-          color: Colors.grey[600], // Fond des cartes en gris foncé
+          color: Colors.grey[600],
         ),
         appBarTheme: AppBarTheme(
           backgroundColor: Colors.blue, // Fond bleu pour l'AppBar
@@ -136,4 +138,3 @@ class MyApp extends StatelessWidget{
     );
   }
 }
-
