@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sae_mobile/Views/profilView.dart';
-import 'Views/Home/home.dart';
+import 'Views/home.dart';
 import 'Views/navigBottom.dart';
 import 'Views/searchView.dart';
 import 'Views/mapView.dart';
