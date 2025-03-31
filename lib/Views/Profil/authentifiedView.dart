@@ -20,28 +20,62 @@ class _AuthentifiedViewState extends State<AuthentifiedView> {
           child: Text("Votre Profil"),
         ),
       ),
-      body: SettingsList(
-          sections: [
-            SettingsSection(
-              tiles: [
-                SettingsTile(
-                  title: Text('Mes favoris'),
-                  trailing: Icon(Icons.favorite),
-                  onPressed: (_) {
-                    context.go('/profile/favoris');
-                  },
-                ),
-                SettingsTile(
-                  title: Text('Mes commentaires'),
-                  trailing: Icon(Icons.comment),
-                  onPressed: (_) {
-                    context.go('/profile/comments');
-                  },
-                ),
-              ],
-            )
-          ],
-        )
+      body: Padding(
+        padding: const EdgeInsets.only(top:80),
+        child: SettingsList(
+            sections: [
+              SettingsSection(
+                margin: EdgeInsetsDirectional.all(16),
+                tiles: [
+                  SettingsTile.navigation(
+                    title: Text('Mes favoris'),
+                    description: Text('Permet de consulter ces favoris'),
+                    leading: Icon(Icons.favorite),
+                    onPressed: (_) {
+                      context.go('/profile/favoris');
+                    },
+                  ),
+                ],
+              ),
+              SettingsSection(
+                  margin: EdgeInsetsDirectional.all(16),
+                  tiles: [
+                    SettingsTile.navigation(
+                      title: Text('Mes commentaires'),
+                      description: Text('Permet de consulter ces commentaires'),
+                      leading: Icon(Icons.comment),
+                      onPressed: (_) {
+                        context.go('/profile/comments');
+                      },
+                    ),
+                  ]
+              ),
+              SettingsSection(
+                  margin: EdgeInsetsDirectional.all(16),
+                  title: Text("Paramètres"),
+                  tiles: [
+                    SettingsTile.switchTile(
+                      initialValue: true,
+                      title: Text('Changer de thème'),
+                      description: Text("WIP"),
+                      leading: Icon(Icons.contrast),
+                      onToggle: (_) {
+                        // Changer de thème
+                      },
+                    ),
+                    SettingsTile(
+                      title: Text('Me déconnecter'),
+                      description: Text("WIP"),
+                      leading: Icon(Icons.logout),
+                      onPressed: (_) {
+                        // Se déconnecter
+                      },
+                    ),
+                  ]
+              )
+            ],
+          ),
+      )
     );
   }
 }
