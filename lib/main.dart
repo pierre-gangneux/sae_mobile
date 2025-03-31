@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
+import 'package:sae_mobile/Views/Profil/authentifiedView.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:sqflite_common_ffi_web/sqflite_ffi_web.dart';
 import 'Views/home.dart';
@@ -63,8 +64,6 @@ class MyApp extends StatelessWidget {
           StatefulShellBranch(
             routes: <RouteBase>[
               GoRoute(
-                // The screen to display as the root in the second tab of the
-                // bottom navigation bar.
                 path: '/restaurants',
                 builder: (BuildContext context, GoRouterState state) => SearchView(),
                 routes: [
@@ -121,6 +120,18 @@ class MyApp extends StatelessWidget {
                         path: "connection",
                         builder: (BuildContext context, GoRouterState state) => ConnectionView(),
                       ),
+                      GoRoute(
+                        path: "authentified",
+                        builder: (BuildContext context, GoRouterState state) => AuthentifiedView(),
+                      ),
+                      GoRoute(
+                        path: "favoris",
+                        builder: (BuildContext context, GoRouterState state) => AuthentifiedView(),
+                      ),
+                      GoRoute(
+                        path: "comments",
+                        builder: (BuildContext context, GoRouterState state) => AuthentifiedView(),
+                      )
                     ],
                   ),
                 ],

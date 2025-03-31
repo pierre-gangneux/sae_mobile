@@ -50,7 +50,7 @@ Future<Database> populateDatabase() async {
     await insertRestaurant(db, item);
   }
   print("Base de données remplie avec succès !");
-  showRestaurant(db);
+  /*showRestaurant(db);*/
   return db;
 }
 
