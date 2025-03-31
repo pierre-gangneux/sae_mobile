@@ -69,7 +69,7 @@ class _ConnectionViewState extends State<ConnectionView> {
                         // Traiter le formulaire ICI
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
-                            content: Text('Connection utilisateur : ${_formKey.currentState?.fields['username']?.value}'),
+                            content: Text('Connexion utilisateur : ${_formKey.currentState?.fields['username']?.value}'),
                           ),
                         );
                       }
