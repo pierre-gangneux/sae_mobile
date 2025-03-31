@@ -1,6 +1,9 @@
+import 'package:sqflite/sqflite.dart';
+
 class Restaurant {
   String osmid;
   String nomRestaurant;
+  String type;
   String? telephone;
   String? siret;
   int etoiles;
@@ -24,6 +27,7 @@ class Restaurant {
   Restaurant({
     required this.osmid,
     required this.nomRestaurant,
+    required this.type,
     required this.etoiles,
     this.telephone,
     this.siret,
@@ -43,6 +47,7 @@ class Restaurant {
 
   // Getters
   String get getOsmid => osmid;
+  String get getType => type;
   String get getNomRestaurant => nomRestaurant;
   int get getEtoiles => etoiles;
   String? get getTelephone => telephone;
@@ -62,4 +67,9 @@ class Restaurant {
 
   String? get getLongitude => longitude;
   String? get getLatitude => latitude;
+
+
+
+
+
 }
