@@ -108,14 +108,15 @@ class ListRestaurants{
   }
 
   bool optionPresent(Restaurant restau, List<String> options) {
-    if (options.contains("vegetarien") && (restau.vegetarien != true)) return false;
-    if (options.contains("vegan") && (restau.vegan != true)) return false;
-    if (options.contains("espaceFumeur") && (restau.espaceFumeur != true)) return false;
-    if (options.contains("livraison") && (restau.livraison != true)) return false;
-    if (options.contains("aEmporter") && (restau.aEmporter != true)) return false;
-    if (options.contains("drive") && (restau.drive != true)) return false;
-    if (options.contains("accessInternet") && (restau.accessInternet != true)) return false;
-    if (options.contains("fauteuilRoulant") && (restau.fauteuilRoulant != true)) return false;
+    print(restau.fauteuilRoulant);
+    if (options.contains("vegetarien") && (restau.vegetarien != "yes")) return false;
+    if (options.contains("vegan") && (restau.vegan != "yes")) return false;
+    if (options.contains("espaceFumeur") && (restau.espaceFumeur != "yes")) return false;
+    if (options.contains("livraison") && (restau.livraison != "yes")) return false;
+    if (options.contains("aEmporter") && (restau.aEmporter != "yes")) return false;
+    if (options.contains("drive") && (restau.drive != "yes")) return false;
+    if (options.contains("accessInternet") && (restau.accessInternet != "yes")) return false;
+    if (options.contains("fauteuilroulant") && (restau.fauteuilRoulant != "yes")) return false;
 
     return true; // Si aucune condition n'a retourné false, alors toutes les options sont respectées.
   }

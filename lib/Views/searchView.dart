@@ -60,7 +60,7 @@ class _SearchViewState extends State<SearchView> {
                               }).toList(),
                             ),
                             SizedBox(height: 20),
-                            FormBuilderFilterChips(
+                            FormBuilderFilterChip(
                               name: 'options',
                               decoration: InputDecoration(
                                 labelText: "Options",
@@ -74,7 +74,7 @@ class _SearchViewState extends State<SearchView> {
                                 FormBuilderChipOption(value: 'aEmporter', child: Text('À emporter')),
                                 FormBuilderChipOption(value: 'drive', child: Text('Drive')),
                                 FormBuilderChipOption(value: 'accessInternet', child: Text('Accès Internet')),
-                                FormBuilderChipOption(value: 'fauteuilRoulant', child: Text('Fauteuil roulant')),
+                                FormBuilderChipOption(value: 'fauteuilroulant', child: Text('Fauteuil roulant')),
                               ],
                               alignment: WrapAlignment.start,
                               runSpacing: 12.0,
