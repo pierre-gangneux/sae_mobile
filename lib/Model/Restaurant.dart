@@ -1,6 +1,9 @@
+import 'package:sqflite/sqflite.dart';
+
 class Restaurant {
   String osmid;
   String nomRestaurant;
+  String type;
   String? telephone;
   String? siret;
   int etoiles;
@@ -24,6 +27,7 @@ class Restaurant {
   Restaurant({
     required this.osmid,
     required this.nomRestaurant,
+    required this.type,
     required this.etoiles,
     this.telephone,
     this.siret,
@@ -43,6 +47,7 @@ class Restaurant {
 
   // Getters
   String get getOsmid => osmid;
+  String get getType => type;
   String get getNomRestaurant => nomRestaurant;
   int get getEtoiles => etoiles;
   String? get getTelephone => telephone;
@@ -64,25 +69,7 @@ class Restaurant {
   String? get getLatitude => latitude;
 
 
-  static List<Restaurant> generateRestaurant(int i){
-    List<Restaurant> restaurants=[];
-    for(int n=0;n<i;n++){
-      restaurants.add(
-          Restaurant(
-            osmid: n.toString(),
-            nomRestaurant: "Restaurant Exemple",
-            etoiles: 5,
-            telephone: "0102030405",
-            siteInternet: "https://www.restaurantexemple.com",
-            facebook: "https://www.facebook.com/restaurantexemple",
-            vegetarien: "yes",
-            vegan: "no",
-            livraison: "yes",
-            latitude: "48.8566",
-            longitude: "2.3522",
-          )
-      );
-    }
-    return restaurants;
-  }
+
+
+
 }

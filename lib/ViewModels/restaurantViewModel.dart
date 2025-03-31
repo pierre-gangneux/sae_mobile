@@ -1,21 +1,42 @@
 import 'package:flutter/cupertino.dart';
+import 'package:provider/provider.dart';
 import 'package:sae_mobile/Model/Restaurant.dart';
+import 'package:sae_mobile/Model/listRestaurants.dart';
+import 'package:sqflite/sqflite.dart';
 
 
 class RestaurantViewModel extends ChangeNotifier{
-  late List<Restaurant> liste;
+  late ListRestaurants listeRestaux;
 
-  RestaurantViewModel(){
-    liste=[];
-    generateRestaurant();
+  RestaurantViewModel(Database db){
+    listeRestaux= new ListRestaurants();
+    init(db);
   }
 
+
   void generateRestaurant(){
-    liste = Restaurant.generateRestaurant(50);
+    listeRestaux.generateRestaurant(50);
     notifyListeners();
   }
 
-  Restaurant? getRestaurantById(String id) {
-    return liste.firstWhere((restaurant) => restaurant.osmid == id, orElse: null);
+  Future<void> init(Database db) async {
+    await listeRestaux.fromDatabase(db);
+    notifyListeners();  // Notifie les écouteurs pour que l'UI se mette à jour
   }
+
+  Restaurant? getRestaurantById(String restaurantId){
+    return listeRestaux.getRestaurantById(restaurantId);
+  }
+
+  List<Restaurant> getRestaurants(){
+    return listeRestaux.currentRestaurants;
+  }
+
+  void setRestaurantFiltre(String? nomRestau, String? categorie, List<String>? options){
+    listeRestaux.setRestaurantFiltre(nomRestau, categorie, options);
+    notifyListeners();
+  }
+
+
+
 }

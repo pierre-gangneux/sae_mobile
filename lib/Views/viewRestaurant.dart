@@ -28,7 +28,7 @@ class ViewRestaurant extends StatelessWidget {
           },
           child: ListTile(
             title: Text(restaurant.nomRestaurant),
-            subtitle: Text("Statut: ${restaurant.telephone ?? 'Non précisé'}"),
+            subtitle: Text("Catégorie: ${restaurant.type ?? 'Non précisé'}"),
             trailing: Text('${restaurant.etoiles} étoiles'),
           ),
         ),
