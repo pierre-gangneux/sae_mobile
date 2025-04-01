@@ -1,6 +1,5 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 
 class CommentsView extends StatefulWidget {
   const CommentsView({super.key});
@@ -17,13 +16,7 @@ class _CommentsViewState extends State<CommentsView> {
         appBar: AppBar(
           title: Padding(
               padding: const EdgeInsets.all(8.0),
-              child: TextButton.icon(
-                icon: Icon(Icons.arrow_back),
-                onPressed: (){
-                  context.go('/profile');
-                },
-                label: Text("Retour")
-              )
+              child: Text("Vos commentaires")
           ),
         ),
         body: Center(child: Text("Commentaires"))
