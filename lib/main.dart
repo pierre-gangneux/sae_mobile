@@ -2,13 +2,13 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
+import 'package:sae_mobile/Views/Profil/commentsView.dart';
+import 'package:sae_mobile/Views/Profil/favorisView.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:sqflite_common_ffi_web/sqflite_ffi_web.dart';  
 import 'ViewModels/LikeViewModel.dart';
 import 'Views/home.dart';
-import 'package:sae_mobile/Views/Profil/connectionView.dart';
 import 'package:sae_mobile/Views/Profil/profilView.dart';
-import 'package:sae_mobile/Views/Profil/registerView.dart';
 import 'Views/navigBottom.dart';
 import 'Views/restaurantDetailView.dart';
 import 'Views/searchView.dart';
@@ -60,8 +60,6 @@ class MyApp extends StatelessWidget {
           StatefulShellBranch(
             routes: <RouteBase>[
               GoRoute(
-                // The screen to display as the root in the second tab of the
-                // bottom navigation bar.
                 path: '/restaurants',
                 builder: (BuildContext context, GoRouterState state) =>
                     SearchView(),
@@ -103,28 +101,16 @@ class MyApp extends StatelessWidget {
             routes: <RouteBase>[
               GoRoute(
                 path: '/profile',
-                redirect: (BuildContext context, GoRouterState state) {
-                  if (state.fullPath == '/profile') {
-                    return '/profile/register';
-                  }
-                  return null;
-                },
+                builder: (BuildContext context, GoRouterState state) => ProfilView(),
                 routes: <RouteBase>[
-                  ShellRoute(
-                    builder: (BuildContext context, GoRouterState state, Widget child) {
-                      return ProfilView(child: child);
-                    },
-                    routes: [
-                      GoRoute(
-                        path: "register",
-                        builder: (BuildContext context, GoRouterState state) => RegisterView(),
-                      ),
-                      GoRoute(
-                        path: "connection",
-                        builder: (BuildContext context, GoRouterState state) => ConnectionView(),
-                      ),
-                    ],
+                  GoRoute(
+                    path: "favoris",
+                    builder: (BuildContext context, GoRouterState state) => FavorisView(),
                   ),
+                  GoRoute(
+                    path: "comments",
+                    builder: (BuildContext context, GoRouterState state) => CommentsView(),
+                  )
                 ],
               ),
             ],
