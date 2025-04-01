@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
+import '../Model/Like.dart';
 import '../Model/Restaurant.dart';
+import '../ViewModels/LikeViewModel.dart';
 
 class RestaurantDetailView extends StatelessWidget {
   final Restaurant restaurant;
@@ -37,7 +40,10 @@ class RestaurantDetailView extends StatelessWidget {
                         ),
                       ),*/
                       ElevatedButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          Like like = new Like(username: "Lucas doit faire", osmid: restaurant.osmid);
+                          context.read<LikeViewModel>().addLike(like);
+                        },
                         style: ElevatedButton.styleFrom(
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(8), // Facultatif pour arrondir

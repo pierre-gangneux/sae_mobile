@@ -1,15 +1,16 @@
 import 'package:sqflite/sqflite.dart';
 
+import 'Like.dart';
 import 'Restaurant.dart';
 import 'User.dart';
 import 'listRestaurants.dart';
 
 
-class UserRepository{
+class LikeRepository{
   final Database db;
   final ListRestaurants lesRestaurant;
 
-  const UserRepository(this.db, this.lesRestaurant);
+  const LikeRepository(this.db, this.lesRestaurant);
 
 
 
@@ -24,6 +25,14 @@ class UserRepository{
       return lesRestaurant.getRestaurantById(row['osmid']);
     }).toList();
     return restaurants;
+  }
+
+  Future<void> addLike(Like like) async {
+    await db.insert(
+        'RESTAURANT_FAVORIS',
+        like.toMap(),
+        conflictAlgorithm: ConflictAlgorithm.replace,
+    );
   }
 
 
