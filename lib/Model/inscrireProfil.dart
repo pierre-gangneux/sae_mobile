@@ -58,8 +58,8 @@ class RegisterModel {
         'UTILISATEUR',
         {
           'username': username,
-          'mdp': hashedPassword, // Stocke le mot de passe hashé
-          'estadmin': 0, // Par défaut, un utilisateur n'est pas admin
+          'mdp': hashedPassword,
+          'estadmin': 0,
         },
         conflictAlgorithm: ConflictAlgorithm.fail,
       );
