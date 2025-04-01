@@ -71,26 +71,25 @@ CREATE TABLE HEURE_OUVERTURE(
 );
 
 CREATE TABLE CUISINE(
-    idcuisine INT PRIMARY KEY,
-    nomcuisine VARCHAR(32)
+    nomcuisine VARCHAR(32) PRIMARY KEY,
 );
 
 CREATE TABLE PROPOSE(
     osmid VARCHAR(32),
-    idcuisine INT,
+    nomcuisine VARCHAR(32),
 
-    PRIMARY KEY (osmid, idCuisine),
+    PRIMARY KEY (osmid, nomcuisine),
     FOREIGN KEY (osmid) REFERENCES RESTAURANT(osmid),
-    FOREIGN KEY (idCuisine) REFERENCES CUISINE(idCuisine)
+    FOREIGN KEY (nomcuisine) REFERENCES CUISINE(nomcuisine)
 );
 
 CREATE TABLE CUISINE_FAVORITES(
     username VARCHAR(32),
-    idcuisine INT,
+    nomcuisine VARCHAR(32),
 
-    PRIMARY KEY (username, idcuisine),
+    PRIMARY KEY (username, nomcuisine),
     FOREIGN KEY (username) REFERENCES UTILISATEUR(username),
-    FOREIGN KEY (idcuisine) REFERENCES CUISINE(idcuisine)
+    FOREIGN KEY (nomcuisine) REFERENCES CUISINE(nomcuisine)
 );
 
 CREATE TABLE AVIS(

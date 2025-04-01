@@ -79,6 +79,7 @@ class ListRestaurants{
   }
 
 
+
   void setRestaurantFiltre(String? nomRestau, String? categorie, List<String>?options) {
     List<Restaurant> res = [];
     for (Restaurant restau in _lesRestaurants) {

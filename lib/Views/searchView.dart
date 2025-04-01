@@ -60,26 +60,48 @@ class _SearchViewState extends State<SearchView> {
                               }).toList(),
                             ),
                             SizedBox(height: 20),
-                            FormBuilderFilterChip(
-                              name: 'options',
-                              decoration: InputDecoration(
-                                labelText: "Options",
-                                border: OutlineInputBorder(),
-                              ),
-                              options: [
-                                FormBuilderChipOption(value: 'vegetarien', child: Text('Végétarien')),
-                                FormBuilderChipOption(value: 'vegan', child: Text('Vegan')),
-                                FormBuilderChipOption(value: 'espaceFumeur', child: Text('Fumeur')),
-                                FormBuilderChipOption(value: 'livraison', child: Text('Livraison')),
-                                FormBuilderChipOption(value: 'aEmporter', child: Text('À emporter')),
-                                FormBuilderChipOption(value: 'drive', child: Text('Drive')),
-                                FormBuilderChipOption(value: 'accessInternet', child: Text('Accès Internet')),
-                                FormBuilderChipOption(value: 'fauteuilroulant', child: Text('Fauteuil roulant')),
-                              ],
-                              alignment: WrapAlignment.start,
-                              runSpacing: 12.0,
-                              spacing: 30.0,
-                              crossAxisAlignment: WrapCrossAlignment.start,
+                            ExpansionTile(
+                                title: Text("Cuisine"),
+                                initiallyExpanded: false, // Filtres fermés par défaut
+                                children:[ FormBuilderFilterChip(
+                                  name: 'cuisine',
+                                  decoration: InputDecoration(
+                                    border: OutlineInputBorder(),
+                                  ),
+                                  options: context.watch<RestaurantViewModel>().getCuisine().map((cuisine) =>
+                                      FormBuilderChipOption(value: cuisine, child: Text(cuisine))
+                                  ).toList(),
+                                  alignment: WrapAlignment.start,
+                                  runSpacing: 12.0,
+                                  spacing: 30.0,
+                                  crossAxisAlignment: WrapCrossAlignment.start,
+                                ),]
+                            ),
+                            SizedBox(height: 20),
+                            ExpansionTile(
+                              title: Text("Options"),
+                              initiallyExpanded: false, // Filtres fermés par défaut
+                              children:[ FormBuilderFilterChip(
+                                name: 'options',
+                                decoration: InputDecoration(
+                                  //labelText: "Options",
+                                  border: OutlineInputBorder(),
+                                ),
+                                options: [
+                                  FormBuilderChipOption(value: 'vegetarien', child: Text('Végétarien')),
+                                  FormBuilderChipOption(value: 'vegan', child: Text('Vegan')),
+                                  FormBuilderChipOption(value: 'espaceFumeur', child: Text('Fumeur')),
+                                  FormBuilderChipOption(value: 'livraison', child: Text('Livraison')),
+                                  FormBuilderChipOption(value: 'aEmporter', child: Text('À emporter')),
+                                  FormBuilderChipOption(value: 'drive', child: Text('Drive')),
+                                  FormBuilderChipOption(value: 'accessInternet', child: Text('Accès Internet')),
+                                  FormBuilderChipOption(value: 'fauteuilroulant', child: Text('Fauteuil roulant')),
+                                ],
+                                alignment: WrapAlignment.start,
+                                runSpacing: 12.0,
+                                spacing: 30.0,
+                                crossAxisAlignment: WrapCrossAlignment.start,
+                              ),]
                             ),
                           ],
                         ),

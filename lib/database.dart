@@ -48,6 +48,7 @@ Future<Database> populateDatabase() async {
   // Insérer les données dans la base de données
   for (var item in jsonData) {
     await insertRestaurant(db, item);
+    await insertCuisine(db, item);
   }
   print("Base de données remplie avec succès !");
   showRestaurant(db);
@@ -86,6 +87,19 @@ Future<void> insertRestaurant(Database db, Map<String, dynamic> item) async {
     conflictAlgorithm: ConflictAlgorithm.replace, //Si meme primary key alors mets à jour les données de la primlary key
 
   );
+}
+
+Future<void> insertCuisine(Database db, Map<String, dynamic> item) async {
+  for (var cuisine in item['cuisine']){
+    await db.insert(
+      'CUISINE',
+      {
+      'nomcuisine':cuisine
+      },
+      conflictAlgorithm: ConflictAlgorithm.replace, //Si meme primary key alors mets à jour les données de la primlary key
+    );
+  }
+
 }
 
 
