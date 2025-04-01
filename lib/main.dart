@@ -3,7 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:sqflite/sqflite.dart';
-import 'package:sqflite_common_ffi_web/sqflite_ffi_web.dart';
+import 'package:sqflite_common_ffi_web/sqflite_ffi_web.dart';  
+import 'ViewModels/LikeViewModel.dart';
 import 'Views/home.dart';
 import 'package:sae_mobile/Views/Profil/connectionView.dart';
 import 'package:sae_mobile/Views/Profil/profilView.dart';
@@ -29,16 +30,12 @@ void main() async {
   // Appeler la fonction pour initialiser la base de données
   final database = await populateDatabase();
 
-  runApp(
-      ChangeNotifierProvider(
-        create: (context) => RestaurantViewModel(database),
-        child: MyApp(database),
-      )
-  );
+  runApp(MyApp(database));
 }
 
 class MyApp extends StatelessWidget {
   final Database? database;
+
   MyApp(this.database, {super.key});
 
   final GoRouter _router = GoRouter(
@@ -66,34 +63,39 @@ class MyApp extends StatelessWidget {
                 // The screen to display as the root in the second tab of the
                 // bottom navigation bar.
                 path: '/restaurants',
-                builder: (BuildContext context, GoRouterState state) => SearchView(),
+                builder: (BuildContext context, GoRouterState state) =>
+                    SearchView(),
                 routes: [
                   GoRoute(
-                      path: ':id', // Chemin enfant dynamique pour le détail du restaurant
-                      builder: (BuildContext context, GoRouterState state) {
-                        final String restaurantId = state.pathParameters['id']!;
-                        // Récupérer l'objet Restaurant en fonction de l'ID via Provider
-                        final restaurantViewModel = Provider.of<RestaurantViewModel>(context);
-                        final restaurant = restaurantViewModel.getRestaurantById(restaurantId);
+                    path: ':id',
+                    // Chemin enfant dynamique pour le détail du restaurant
+                    builder: (BuildContext context, GoRouterState state) {
+                      final String restaurantId = state.pathParameters['id']!;
+                      // Récupérer l'objet Restaurant en fonction de l'ID via Provider
+                      final restaurantViewModel = Provider.of<
+                          RestaurantViewModel>(context);
+                      final restaurant = restaurantViewModel.getRestaurantById(
+                          restaurantId);
 
-                        if (restaurant == null) {
-                          return Scaffold(body: Center(child: Text('Restaurant non trouvé')));
-                        }
+                      if (restaurant == null) {
+                        return Scaffold(body: Center(child: Text(
+                            'Restaurant non trouvé')));
+                      }
 
-                        // Passer l'objet Restaurant au widget RestaurantDetailView
-                        return RestaurantDetailView(restaurant: restaurant);
-
-                      },
-                    ),
-                  ],
-                ),
+                      // Passer l'objet Restaurant au widget RestaurantDetailView
+                      return RestaurantDetailView(restaurant: restaurant);
+                    },
+                  ),
+                ],
+              ),
             ],
           ),
           StatefulShellBranch(
             routes: <RouteBase>[
               GoRoute(
                 path: '/map',
-                builder: (BuildContext context, GoRouterState state) => MapView(),
+                builder: (BuildContext context, GoRouterState state) =>
+                    MapView(),
               ),
             ],
           ),
@@ -135,30 +137,46 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp.router(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-        bottomNavigationBarTheme: const BottomNavigationBarThemeData(
-          backgroundColor: Colors.white,
-          selectedItemColor: Colors.blue,
-          unselectedItemColor: Colors.grey,
-          elevation: 5,
-        ),
-        cardTheme: CardTheme(
-          color: Colors.grey[600],
-        ),
-        appBarTheme: AppBarTheme(
-          backgroundColor: Colors.blue, // Fond bleu pour l'AppBar
-          elevation: 0, // Tu peux ajuster l'élévation si nécessaire
-          titleTextStyle: TextStyle(
-            color: Colors.white, // Couleur du texte de l'AppBar
-            fontSize: 20, // Taille de police du titre
-          ),
-        ),
+    RestaurantViewModel restaurantViewModel = RestaurantViewModel(database!);
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (context) => restaurantViewModel),
+        ChangeNotifierProvider(
+            create: (_) {
+              LikeViewModel likeViewModel = LikeViewModel(
+                  database!, restaurantViewModel.listeRestaux);
+              return likeViewModel;
+            })
+      ],
+      child: Consumer<RestaurantViewModel>(
+        builder: (context, restaurantViewModel, child) {
+          return MaterialApp.router(
+            title: 'Flutter Demo',
+            theme: ThemeData(
+              primarySwatch: Colors.blue,
+              bottomNavigationBarTheme: const BottomNavigationBarThemeData(
+                backgroundColor: Colors.white,
+                selectedItemColor: Colors.blue,
+                unselectedItemColor: Colors.grey,
+                elevation: 5,
+              ),
+              cardTheme: CardTheme(
+                color: Colors.grey[600],
+              ),
+              appBarTheme: const AppBarTheme(
+                backgroundColor: Colors.blue,
+                elevation: 0,
+                titleTextStyle: TextStyle(
+                  color: Colors.white,
+                  fontSize: 20,
+                ),
+              ),
+            ),
+            routerConfig: _router,
+          );
+        },
       ),
-
-      routerConfig: _router,
     );
   }
 }
+
