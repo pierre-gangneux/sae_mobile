@@ -39,7 +39,7 @@ class _RegisterViewState extends State<RegisterView> {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Inscription réussie')),
           );
-          context.go('/profile/connection'); // Rediriger vers la page de connexion
+          context.go('/connexion'); // Rediriger vers la page de connexion
         }
       } else {
         if (mounted) {
