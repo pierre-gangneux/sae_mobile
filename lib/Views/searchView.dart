@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:provider/provider.dart';
+import 'package:sae_mobile/Model/CuisineRepository.dart';
 import 'package:sae_mobile/Views/viewRestaurant.dart';
 
+import '../ViewModels/cuisineViewModel.dart';
 import '../ViewModels/restaurantViewModel.dart';
 
 class SearchView extends StatefulWidget {
@@ -68,9 +70,10 @@ class _SearchViewState extends State<SearchView> {
                                   decoration: InputDecoration(
                                     border: OutlineInputBorder(),
                                   ),
-                                  options: context.watch<RestaurantViewModel>().getCuisine().map((cuisine) =>
+                                  options: context.watch<CuisineViewModel>().cuisines.map((cuisine) =>
                                       FormBuilderChipOption(value: cuisine, child: Text(cuisine))
                                   ).toList(),
+
                                   alignment: WrapAlignment.start,
                                   runSpacing: 12.0,
                                   spacing: 30.0,

@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:sqflite_common_ffi_web/sqflite_ffi_web.dart';  
 import 'ViewModels/LikeViewModel.dart';
+import 'ViewModels/cuisineViewModel.dart';
 import 'Views/home.dart';
 import 'package:sae_mobile/Views/Profil/connectionView.dart';
 import 'package:sae_mobile/Views/Profil/profilView.dart';
@@ -146,6 +147,11 @@ class MyApp extends StatelessWidget {
               LikeViewModel likeViewModel = LikeViewModel(
                   database!, restaurantViewModel.listeRestaux);
               return likeViewModel;
+            }),
+        ChangeNotifierProvider(
+            create: (_) {
+              CuisineViewModel cuisineViewModel = CuisineViewModel(database!);
+              return cuisineViewModel;
             })
       ],
       child: Consumer<RestaurantViewModel>(

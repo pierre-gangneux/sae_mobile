@@ -90,15 +90,19 @@ Future<void> insertRestaurant(Database db, Map<String, dynamic> item) async {
 }
 
 Future<void> insertCuisine(Database db, Map<String, dynamic> item) async {
-  for (var cuisine in item['cuisine']){
-    await db.insert(
-      'CUISINE',
-      {
-      'nomcuisine':cuisine
-      },
-      conflictAlgorithm: ConflictAlgorithm.replace, //Si meme primary key alors mets à jour les données de la primlary key
-    );
+
+  if (item['cuisine'] != null){
+    for (var cuisine in item['cuisine']){
+      await db.insert(
+        'CUISINE',
+        {
+          'nomcuisine':cuisine
+        },
+        conflictAlgorithm: ConflictAlgorithm.replace, //Si meme primary key alors mets à jour les données de la primlary key
+      );
+    }
   }
+
 
 }
 
