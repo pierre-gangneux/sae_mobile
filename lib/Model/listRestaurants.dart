@@ -1,5 +1,8 @@
+import 'package:sae_mobile/Model/Cuisine.dart';
 import 'package:sqflite/sqflite.dart';
 
+import '../ViewModels/cuisineViewModel.dart';
+import 'CuisineRepository.dart';
 import 'Restaurant.dart';
 
 class ListRestaurants{
@@ -43,6 +46,7 @@ class ListRestaurants{
     }).toList();
     _lesRestaurants = restaurants;
     _currentRestaurants = restaurants;
+
     return restaurants;
   }
 
@@ -80,13 +84,17 @@ class ListRestaurants{
 
 
 
-  void setRestaurantFiltre(String? nomRestau, String? categorie, List<String>?options) {
+  Future<void> setRestaurantFiltre(Database db, String? nomRestau, String? categorie, List<String>?options, List<String>? selectCuisines) async {
+    CuisineRepository CR =  new CuisineRepository(db);
     List<Restaurant> res = [];
     for (Restaurant restau in _lesRestaurants) {
+      await CR.loadCuisinesRestaurant(restau);
+      List<String> cuisinesRestau = CR.getCuisinesRestaurant();
       if (
-      (nomRestau == null || restau.nomRestaurant.toLowerCase().contains(nomRestau.toLowerCase()))
+      (nomRestau == null || restau.nomRestaurant.toLowerCase().contains(nomRestau.toLowerCase()) )
       && (categorie == null || sameCategorie(categorie, restau.type))
       && (options == null || optionPresent(restau, options))
+      && cuisinePresent(cuisinesRestau ,selectCuisines)
       ) {
         res.add(restau);
       }
@@ -121,6 +129,21 @@ class ListRestaurants{
 
     return true; // Si aucune condition n'a retourné false, alors toutes les options sont respectées.
   }
+
+  bool cuisinePresent(List<String> cuisines, List<String>? selectCuisines) {
+    if (selectCuisines == null || selectCuisines.isEmpty) {
+      return true; // Aucun filtre appliqué sur les cuisines
+    }
+
+    for (String selected in selectCuisines) {
+      if (cuisines.contains(selected)) {
+        return true; // Une correspondance trouvée
+      }
+    }
+    return false; // Aucune correspondance trouvée
+  }
+
+
 
 
 }

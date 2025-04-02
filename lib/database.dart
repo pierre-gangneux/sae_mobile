@@ -100,11 +100,22 @@ Future<void> insertCuisine(Database db, Map<String, dynamic> item) async {
         },
         conflictAlgorithm: ConflictAlgorithm.replace, //Si meme primary key alors mets à jour les données de la primlary key
       );
+      await db.insert(
+          'CUISINE_RESTAURANT',
+          {
+            'nomcuisine':cuisine,
+            'osmid':item['osm_id']
+          },
+          conflictAlgorithm: ConflictAlgorithm.replace, //Si meme primary key alors mets à jour les données de la primlary key
+      );
     }
   }
+}
 
+Future<void> insertCuisine_Restaurant(Database db, Map<String, dynamic> item) async {
 
 }
+
 
 
 Future<void> showRestaurant(Database db) async {

@@ -117,7 +117,7 @@ class _SearchViewState extends State<SearchView> {
                       if (_formKey.currentState!.saveAndValidate()) {
                         print("Valeurs sélectionnées : ${_formKey.currentState!.value}");
                         var value = _formKey.currentState!.value;
-                        context.read<RestaurantViewModel>().setRestaurantFiltre(value["search"], value["categorie"], value["options"]);
+                        context.read<RestaurantViewModel>().setRestaurantFiltre(value["search"], value["categorie"], value["options"], value["cuisine"]);
                       }
                     },
                     child: Text("Filtrer"),

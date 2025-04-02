@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart'; // Pour ChangeNotifier
+import 'package:sae_mobile/Model/Restaurant.dart';
 import 'package:sqflite/sqflite.dart';
 import '../Model/CuisineRepository.dart';
 
@@ -6,6 +7,7 @@ import '../Model/CuisineRepository.dart';
 class CuisineViewModel extends ChangeNotifier {
   late CuisineRepository cuisineRepository;
   List<String> cuisines = [];
+
 
   CuisineViewModel(Database db) {
     cuisineRepository = CuisineRepository(db);
@@ -17,4 +19,6 @@ class CuisineViewModel extends ChangeNotifier {
     cuisines = cuisineRepository.getCuisines();
     notifyListeners();
   }
+
+
 }

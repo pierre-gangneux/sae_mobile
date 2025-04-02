@@ -74,6 +74,12 @@ CREATE TABLE CUISINE(
     nomcuisine VARCHAR(32) PRIMARY KEY
 );
 
+CREATE TABLE CUISINE_RESTAURANT(
+    nomcuisine VARCHAR(32),
+    osmid VARCHAR(40),
+    PRIMARY KEY(nomcuisine, osmid)
+);
+
 CREATE TABLE PROPOSE(
     osmid VARCHAR(32),
     nomcuisine VARCHAR(32),
