@@ -7,9 +7,11 @@ import 'package:sqflite/sqflite.dart';
 
 class RestaurantViewModel extends ChangeNotifier{
   late ListRestaurants listeRestaux;
+  late Database _db;
 
   RestaurantViewModel(Database db){
     listeRestaux= new ListRestaurants();
+    _db = db;
     init(db);
   }
 
@@ -32,8 +34,10 @@ class RestaurantViewModel extends ChangeNotifier{
     return listeRestaux.currentRestaurants;
   }
 
-  void setRestaurantFiltre(String? nomRestau, String? categorie, List<String>? options){
-    listeRestaux.setRestaurantFiltre(nomRestau, categorie, options);
+
+
+  Future<void> setRestaurantFiltre(String? nomRestau, String? categorie, List<String>? options, List<String>? cuisinesSelect) async {
+    await listeRestaux.setRestaurantFiltre(_db, nomRestau, categorie, options, cuisinesSelect);
     notifyListeners();
   }
 
