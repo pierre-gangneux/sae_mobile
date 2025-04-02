@@ -22,7 +22,7 @@ class LoginModel {
       dbPath,
       version: 1,
       onCreate: (Database db, int version) async {
-        // Tout est déja initialisé
+        // Tout est déja initialisée
       },
     );
 
