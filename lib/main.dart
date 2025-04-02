@@ -5,11 +5,13 @@ import 'package:provider/provider.dart';
 import 'package:sae_mobile/Views/Profil/commentsView.dart';
 import 'package:sae_mobile/Views/Profil/favorisView.dart';
 import 'package:sqflite/sqflite.dart';
-import 'package:sqflite_common_ffi_web/sqflite_ffi_web.dart';  
+import 'package:sqflite_common_ffi_web/sqflite_ffi_web.dart';
+import 'Views/connectionView.dart';
 import 'ViewModels/LikeViewModel.dart';
 import 'Views/home.dart';
 import 'package:sae_mobile/Views/Profil/profilView.dart';
 import 'Views/navigBottom.dart';
+import 'Views/registerView.dart';
 import 'Views/restaurantDetailView.dart';
 import 'Views/searchView.dart';
 import 'Views/mapView.dart';
@@ -18,7 +20,6 @@ import 'ViewModels/restaurantViewModel.dart';
 
 final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'root');
 final GlobalKey<NavigatorState> _sectionANavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'sectionANav');
-
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -40,7 +41,7 @@ class MyApp extends StatelessWidget {
 
   final GoRouter _router = GoRouter(
     navigatorKey: _rootNavigatorKey,
-    initialLocation: '/home',
+    initialLocation: '/register', // Modifier la route initiale vers la page RegisterView
     routes: <RouteBase>[
       StatefulShellRoute.indexedStack(
         builder: (BuildContext context, GoRouterState state,
@@ -70,14 +71,11 @@ class MyApp extends StatelessWidget {
                     builder: (BuildContext context, GoRouterState state) {
                       final String restaurantId = state.pathParameters['id']!;
                       // Récupérer l'objet Restaurant en fonction de l'ID via Provider
-                      final restaurantViewModel = Provider.of<
-                          RestaurantViewModel>(context);
-                      final restaurant = restaurantViewModel.getRestaurantById(
-                          restaurantId);
+                      final restaurantViewModel = Provider.of<RestaurantViewModel>(context);
+                      final restaurant = restaurantViewModel.getRestaurantById(restaurantId);
 
                       if (restaurant == null) {
-                        return Scaffold(body: Center(child: Text(
-                            'Restaurant non trouvé')));
+                        return Scaffold(body: Center(child: Text('Restaurant non trouvé')));
                       }
 
                       // Passer l'objet Restaurant au widget RestaurantDetailView
@@ -117,9 +115,18 @@ class MyApp extends StatelessWidget {
           ),
         ],
       ),
+      // Route pour la page d'inscription
+      GoRoute(
+        path: '/register',
+        builder: (BuildContext context, GoRouterState state) => const RegisterView(),
+      ),
+      // Route pour la page de connexion
+      GoRoute(
+        path: '/connexion',
+        builder: (BuildContext context, GoRouterState state) => const ConnectionView(),
+      ),
     ],
   );
-
 
   @override
   Widget build(BuildContext context) {
@@ -165,4 +172,3 @@ class MyApp extends StatelessWidget {
     );
   }
 }
-
