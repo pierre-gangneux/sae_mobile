@@ -2,9 +2,12 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
+import 'package:sae_mobile/Views/Profil/commentsView.dart';
+import 'package:sae_mobile/Views/Profil/favorisView.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:sqflite_common_ffi_web/sqflite_ffi_web.dart';
 import 'Views/connectionView.dart';
+import 'ViewModels/LikeViewModel.dart';
 import 'Views/home.dart';
 import 'package:sae_mobile/Views/Profil/profilView.dart';
 import 'Views/navigBottom.dart';
@@ -58,9 +61,9 @@ class MyApp extends StatelessWidget {
           StatefulShellBranch(
             routes: <RouteBase>[
               GoRoute(
-                // La page des restaurants
                 path: '/restaurants',
-                builder: (BuildContext context, GoRouterState state) => SearchView(),
+                builder: (BuildContext context, GoRouterState state) =>
+                    SearchView(),
                 routes: [
                   GoRoute(
                     path: ':id',
@@ -73,6 +76,14 @@ class MyApp extends StatelessWidget {
 
                       if (restaurant == null) {
                         return Scaffold(body: Center(child: Text('Restaurant non trouvé')));
+                      final restaurantViewModel = Provider.of<
+                          RestaurantViewModel>(context);
+                      final restaurant = restaurantViewModel.getRestaurantById(
+                          restaurantId);
+
+                      if (restaurant == null) {
+                        return Scaffold(body: Center(child: Text(
+                            'Restaurant non trouvé')));
                       }
 
                       // Passer l'objet Restaurant au widget RestaurantDetailView
@@ -87,7 +98,26 @@ class MyApp extends StatelessWidget {
             routes: <RouteBase>[
               GoRoute(
                 path: '/map',
-                builder: (BuildContext context, GoRouterState state) => MapView(),
+                builder: (BuildContext context, GoRouterState state) =>
+                    MapView(),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: <RouteBase>[
+              GoRoute(
+                path: '/profile',
+                builder: (BuildContext context, GoRouterState state) => ProfilView(),
+                routes: <RouteBase>[
+                  GoRoute(
+                    path: "favoris",
+                    builder: (BuildContext context, GoRouterState state) => FavorisView(),
+                  ),
+                  GoRoute(
+                    path: "comments",
+                    builder: (BuildContext context, GoRouterState state) => CommentsView(),
+                  )
+                ],
               ),
             ],
           ),
@@ -115,6 +145,12 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (context) => restaurantViewModel),
+        ChangeNotifierProvider(
+            create: (_) {
+              LikeViewModel likeViewModel = LikeViewModel(
+                  database!, restaurantViewModel.listeRestaux);
+              return likeViewModel;
+            })
       ],
       child: Consumer<RestaurantViewModel>(
         builder: (context, restaurantViewModel, child) {
@@ -147,3 +183,4 @@ class MyApp extends StatelessWidget {
     );
   }
 }
+

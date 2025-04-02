@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
+import '../Model/Like.dart';
 import '../Model/Restaurant.dart';
+import '../ViewModels/LikeViewModel.dart';
 
 class RestaurantDetailView extends StatelessWidget {
   final Restaurant restaurant;
@@ -22,7 +25,7 @@ class RestaurantDetailView extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Nom du restaurant et étoiles
+                  // Nom du restaurant et like
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -30,12 +33,27 @@ class RestaurantDetailView extends StatelessWidget {
                         restaurant.nomRestaurant,
                         style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
                       ),
-                      Row(
+                      /*Row(
                         children: List.generate(
                           restaurant.etoiles,
                               (index) => Icon(Icons.star, color: Colors.amber),
                         ),
+                      ),*/
+                      ElevatedButton(
+                        onPressed: () {
+                          Like like = new Like(username: "Lucas doit faire", osmid: restaurant.osmid);
+                          context.read<LikeViewModel>().addLike(like);
+                        },
+                        style: ElevatedButton.styleFrom(
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8), // Facultatif pour arrondir
+                          ),
+                          padding: EdgeInsets.all(12), // Ajuste l'espace interne
+                        ),
+                        child: Icon(Icons.favorite),
                       ),
+
+
                     ],
                   ),
                   SizedBox(height: 8),
