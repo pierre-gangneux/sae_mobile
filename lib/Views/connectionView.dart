@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:go_router/go_router.dart';
+import 'package:sqflite/sqflite.dart';
+import '../Model/connexionModel.dart';
 
 class ConnectionView extends StatefulWidget {
   const ConnectionView({super.key});
@@ -14,6 +16,12 @@ class ConnectionView extends StatefulWidget {
 class _ConnectionViewState extends State<ConnectionView> {
   final _formKey = GlobalKey<FormBuilderState>();
   bool _isPasswordHide = true;
+  bool _isLoading = false;  // Pour indiquer si la requête est en cours
+
+  Future<String> getDatabasePath() async {
+    return "${await getDatabasesPath()}/database.db";
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -64,23 +72,41 @@ class _ConnectionViewState extends State<ConnectionView> {
               Row(
                 children: [
                   ElevatedButton(
-                    onPressed: () {
+                    onPressed: () async {
+                      final String dbPath = await getDatabasePath(); // Obtenir le chemin de la base de données
                       if (_formKey.currentState!.validate()) {
-                        // Traiter le formulaire ICI
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text('Connection utilisateur : ${_formKey.currentState?.fields['username']?.value}'),
-                          ),
-                        );
+                        setState(() {
+                          _isLoading = true;
+                        });
+                        String username = _formKey.currentState?.fields['username']?.value;
+                        String password = _formKey.currentState?.fields['password']?.value;
+
+                        LoginModel loginModel = LoginModel(username: username, password: password);
+
+                        // Appeler la méthode loginUser pour vérifier l'utilisateur
+                        bool isConnected = await loginModel.loginUser(dbPath);
+
+                        setState(() {
+                          _isLoading = false;
+                        });
+
+                        if (isConnected) {
+                          // L'utilisateur est connecté
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text('Connexion réussie pour $username')),
+                          );
+                          // Rediriger vers la page principale ou autre page après connexion
+                          context.go('/home');
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text('Nom d\'utilisateur ou mot de passe incorrect')),
+                          );
+                        }
                       }
                     },
-                    child: const Text('Envoyer'),
-                  ),
-                  ElevatedButton(
-                    onPressed: () {
-                      context.go('/profile/register');
-                    },
-                    child: const Text("S'enregistrer"),
+                    child: _isLoading
+                        ? CircularProgressIndicator(color: Colors.white)
+                        : const Text('Se connecter'),
                   ),
                 ],
               ),

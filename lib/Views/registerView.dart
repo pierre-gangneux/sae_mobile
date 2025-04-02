@@ -1,8 +1,10 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:go_router/go_router.dart';
+import 'package:sqflite/sqflite.dart';
+import '../Model/inscrireModel.dart';
+import 'package:flutter/widgets.dart';
 
 class RegisterView extends StatefulWidget {
   const RegisterView({super.key});
@@ -13,66 +15,47 @@ class RegisterView extends StatefulWidget {
 
 class _RegisterViewState extends State<RegisterView> {
   final _formKey = GlobalKey<FormBuilderState>();
+  final RegisterModel _registerModel = RegisterModel(username: '', password: '', confirmPassword: '');
   bool _isPasswordHide = true;
   bool _isConfirmHide = true;
   double _passwordStrength = 0;
-  String _password = '';
 
-  double getPasswordStrength(String password) {
-    if (password.isEmpty) return 0.0;
-
-    int score = 0;
-    if (password.length >= 8) score++;
-    if (RegExp(r'[A-Z]').hasMatch(password)) score++;
-    if (RegExp(r'[a-z]').hasMatch(password)) score++;
-    if (RegExp(r'\d').hasMatch(password)) score++;
-    if (RegExp(r'[\W]').hasMatch(password)) score++;
-
-    return score / 5.0;
+  Future<String> getDatabasePath() async {
+    return "${await getDatabasesPath()}/database.db";
   }
 
-  Color getStrengthColor(double strength) {
-    if (strength < 0.3) return Colors.red;
-    if (strength < 0.7) return Colors.orange;
-    return Colors.green;
-  }
+  Future<void> _registerAndNavigate() async {
+    if (_formKey.currentState!.validate()) {
+      _formKey.currentState!.save();
+      _registerModel.username = _formKey.currentState?.fields['username']?.value ?? '';
+      _registerModel.password = _formKey.currentState?.fields['password']?.value ?? '';
+      _registerModel.confirmPassword = _formKey.currentState?.fields['ConfirmPassword']?.value ?? '';
 
-  String getStrengthText(double strength) {
-    if (strength < 0.3) return "Mot de passe faible";
-    if (strength < 0.7) return "Mot de passe moyen";
-    return "Mot de passe fort";
-  }
+      final String dbPath = await getDatabasePath(); // Obtenir le chemin de la base de données
 
-  String? passwordValidator(String? password) {
-    if (password == null || password.isEmpty) {
-      return "Le mot de passe ne doit pas être vide";
+      bool success = await _registerModel.registerUser(dbPath);
+      if (success) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Inscription réussie')),
+          );
+          context.go('/connexion'); // Rediriger vers la page de connexion
+        }
+      } else {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Erreur lors de l\'inscription')),
+          );
+        }
+      }
     }
-    double strength = getPasswordStrength(password);
-    if (strength < 0.3) {
-      return "Mot de passe trop faible";
-    }
-    return null;
-  }
-
-  String? confirmValidator(String? confirm) {
-    String password = _formKey.currentState?.fields['password']?.value;
-    if (confirm == null || confirm.isEmpty){
-      return "Le champ ne doit pas être vide";
-    }
-    if (password != confirm){
-      return "Le mot de passe n'est pas identique";
-    }
-    return null;
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Text("S'enregistrer"),
-        ),
+        title: const Text("S'enregistrer"),
       ),
       body: Padding(
         padding: const EdgeInsets.all(30.0),
@@ -84,14 +67,12 @@ class _RegisterViewState extends State<RegisterView> {
                 key: _formKey,
                 child: Column(
                   children: [
-                    // Username
                     FormBuilderTextField(
                       name: 'username',
                       decoration: const InputDecoration(labelText: "Nom d'utilisateur"),
                       validator: FormBuilderValidators.required(errorText: "Veuillez renseigner un nom d'utilisateur"),
                     ),
                     const SizedBox(height: 20),
-                    // Password
                     FormBuilderTextField(
                       name: 'password',
                       obscureText: _isPasswordHide,
@@ -108,35 +89,41 @@ class _RegisterViewState extends State<RegisterView> {
                       ),
                       onChanged: (value) {
                         setState(() {
-                          _password = value ?? '';
-                          _passwordStrength = getPasswordStrength(_password);
+                          _passwordStrength = _registerModel.getPasswordStrength(value ?? '');
                         });
                       },
-                      validator: passwordValidator,
+                      validator: (password) {
+                        if (password == null || password.isEmpty) {
+                          return "Le mot de passe ne doit pas être vide";
+                        }
+                        if (_registerModel.getPasswordStrength(password) < 0.3) {
+                          return "Mot de passe trop faible";
+                        }
+                        return null;
+                      },
                     ),
                     const SizedBox(height: 10),
 
-                    if (_password.isNotEmpty) ...[
+                    if (_passwordStrength > 0) ...[
                       LinearProgressIndicator(
                         value: _passwordStrength,
                         backgroundColor: Colors.grey[300],
-                        color: getStrengthColor(_passwordStrength),
+                        color: _passwordStrength < 0.3 ? Colors.red : (_passwordStrength < 0.7 ? Colors.orange : Colors.green),
                         minHeight: 8,
                       ),
                       const SizedBox(height: 2),
                       Text(
-                        getStrengthText(_passwordStrength),
+                        _passwordStrength < 0.3 ? "Mot de passe faible"
+                            : (_passwordStrength < 0.7 ? "Mot de passe moyen" : "Mot de passe fort"),
                         style: TextStyle(
-                          color: getStrengthColor(_passwordStrength),
+                          color: _passwordStrength < 0.3 ? Colors.red : (_passwordStrength < 0.7 ? Colors.orange : Colors.green),
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                    ]
-                    else ...[
+                    ] else ...[
                       const SizedBox(height: 30),
                     ],
 
-                    const SizedBox(height: 0),
                     FormBuilderTextField(
                       name: 'ConfirmPassword',
                       obscureText: _isConfirmHide,
@@ -151,34 +138,24 @@ class _RegisterViewState extends State<RegisterView> {
                           },
                         ),
                       ),
-                      validator: confirmValidator,
+                      validator: (confirm) {
+                        String password = _formKey.currentState?.fields['password']?.value ?? '';
+                        if (confirm == null || confirm.isEmpty) {
+                          return "Le champ ne doit pas être vide";
+                        }
+                        if (password != confirm) {
+                          return "Le mot de passe n'est pas identique";
+                        }
+                        return null;
+                      },
                     ),
                   ],
                 ),
               ),
               const SizedBox(height: 20),
-              Row(
-                children: [
-                  ElevatedButton(
-                    onPressed: () {
-                      if (_formKey.currentState!.validate()) {
-                        // Traiter le formulaire ICI
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text('Nouvel utilisateur : ${_formKey.currentState?.fields['username']?.value}'),
-                          ),
-                        );
-                      }
-                    },
-                    child: const Text('Envoyer'),
-                  ),
-                  ElevatedButton(
-                    onPressed: () {
-                      context.go('/profile/connection');
-                    },
-                    child: const Text('Connection'),
-                  ),
-                ],
+              ElevatedButton(
+                onPressed: _registerAndNavigate, // Inscrire et rediriger avec un seul bouton
+                child: const Text('S\'enregistrer'),
               ),
             ],
           ),
