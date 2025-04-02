@@ -1,6 +1,9 @@
 import 'dart:convert';
 import 'package:crypto/crypto.dart';
 import 'package:sqflite/sqflite.dart';
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'authentification.dart'; // Assurez-vous d'importer AuthState
 
 class LoginModel {
   String username;
@@ -17,7 +20,7 @@ class LoginModel {
   }
 
   // Vérifie les informations d'identification dans la base de données
-  Future<bool> loginUser(String dbPath) async {
+  Future<bool> loginUser(BuildContext context, String dbPath) async {
     final Database db = await openDatabase(
       dbPath,
       version: 1,
@@ -37,7 +40,8 @@ class LoginModel {
       );
 
       if (users.isNotEmpty) {
-        // Utilisateur Trouvé
+        // Utilisateur trouvé, mettre à jour l'état de connexion
+        Provider.of<AuthState>(context, listen: false).signIn();
         return true;
       } else {
         return false;

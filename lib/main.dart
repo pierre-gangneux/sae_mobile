@@ -6,6 +6,7 @@ import 'package:sae_mobile/Views/Profil/commentsView.dart';
 import 'package:sae_mobile/Views/Profil/favorisView.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:sqflite_common_ffi_web/sqflite_ffi_web.dart';
+import 'Model/authentification.dart';
 import 'Views/connectionView.dart';
 import 'ViewModels/LikeViewModel.dart';
 import 'Views/home.dart';
@@ -41,7 +42,26 @@ class MyApp extends StatelessWidget {
 
   final GoRouter _router = GoRouter(
     navigatorKey: _rootNavigatorKey,
-    initialLocation: '/register', // Modifier la route initiale vers la page RegisterView
+    initialLocation: '/register', // Route initiale
+    redirect: (BuildContext context, GoRouterState state) {
+      final authState = Provider.of<AuthState>(context, listen: false);
+
+      // Vérifie si l'utilisateur essaye de tricher
+      final isLoggingIn = state.matchedLocation == '/connexion';
+      final isRegistering = state.matchedLocation == '/register';
+
+      // Si l'utilisateur essaye de tricher
+      if (!authState.isSignedIn) {
+        // A le droit d'aller sur /connexion ou /register
+        if (isLoggingIn || isRegistering) {
+          return null;
+        }
+        return '/register'; // Renvoie vers /register
+      }
+
+      // Sinon c'est bon
+      return null;
+    },
     routes: <RouteBase>[
       StatefulShellRoute.indexedStack(
         builder: (BuildContext context, GoRouterState state,
@@ -62,15 +82,12 @@ class MyApp extends StatelessWidget {
             routes: <RouteBase>[
               GoRoute(
                 path: '/restaurants',
-                builder: (BuildContext context, GoRouterState state) =>
-                    SearchView(),
+                builder: (BuildContext context, GoRouterState state) => SearchView(),
                 routes: [
                   GoRoute(
                     path: ':id',
-                    // Chemin enfant dynamique pour le détail du restaurant
                     builder: (BuildContext context, GoRouterState state) {
                       final String restaurantId = state.pathParameters['id']!;
-                      // Récupérer l'objet Restaurant en fonction de l'ID via Provider
                       final restaurantViewModel = Provider.of<RestaurantViewModel>(context);
                       final restaurant = restaurantViewModel.getRestaurantById(restaurantId);
 
@@ -78,7 +95,6 @@ class MyApp extends StatelessWidget {
                         return Scaffold(body: Center(child: Text('Restaurant non trouvé')));
                       }
 
-                      // Passer l'objet Restaurant au widget RestaurantDetailView
                       return RestaurantDetailView(restaurant: restaurant);
                     },
                   ),
@@ -90,8 +106,7 @@ class MyApp extends StatelessWidget {
             routes: <RouteBase>[
               GoRoute(
                 path: '/map',
-                builder: (BuildContext context, GoRouterState state) =>
-                    MapView(),
+                builder: (BuildContext context, GoRouterState state) => MapView(),
               ),
             ],
           ),
@@ -115,12 +130,10 @@ class MyApp extends StatelessWidget {
           ),
         ],
       ),
-      // Route pour la page d'inscription
       GoRoute(
         path: '/register',
         builder: (BuildContext context, GoRouterState state) => const RegisterView(),
       ),
-      // Route pour la page de connexion
       GoRoute(
         path: '/connexion',
         builder: (BuildContext context, GoRouterState state) => const ConnectionView(),
@@ -128,11 +141,13 @@ class MyApp extends StatelessWidget {
     ],
   );
 
+
   @override
   Widget build(BuildContext context) {
     RestaurantViewModel restaurantViewModel = RestaurantViewModel(database!);
     return MultiProvider(
       providers: [
+        ChangeNotifierProvider(create: (context) => AuthState()),
         ChangeNotifierProvider(create: (context) => restaurantViewModel),
         ChangeNotifierProvider(
             create: (_) {

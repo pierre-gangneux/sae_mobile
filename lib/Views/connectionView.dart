@@ -84,7 +84,7 @@ class _ConnectionViewState extends State<ConnectionView> {
                         LoginModel loginModel = LoginModel(username: username, password: password);
 
                         // Appeler la méthode loginUser pour vérifier l'utilisateur
-                        bool isConnected = await loginModel.loginUser(dbPath);
+                        bool isConnected = await loginModel.loginUser(context, dbPath);
 
                         setState(() {
                           _isLoading = false;
