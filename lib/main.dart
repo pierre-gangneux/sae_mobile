@@ -76,14 +76,6 @@ class MyApp extends StatelessWidget {
 
                       if (restaurant == null) {
                         return Scaffold(body: Center(child: Text('Restaurant non trouvé')));
-                      final restaurantViewModel = Provider.of<
-                          RestaurantViewModel>(context);
-                      final restaurant = restaurantViewModel.getRestaurantById(
-                          restaurantId);
-
-                      if (restaurant == null) {
-                        return Scaffold(body: Center(child: Text(
-                            'Restaurant non trouvé')));
                       }
 
                       // Passer l'objet Restaurant au widget RestaurantDetailView
@@ -133,11 +125,8 @@ class MyApp extends StatelessWidget {
         path: '/connexion',
         builder: (BuildContext context, GoRouterState state) => const ConnectionView(),
       ),
-
     ],
   );
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -183,4 +172,3 @@ class MyApp extends StatelessWidget {
     );
   }
 }
-
