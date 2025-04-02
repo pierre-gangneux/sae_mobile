@@ -3,7 +3,7 @@ import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sqflite/sqflite.dart';
-import '../Model/inscrireProfil.dart';
+import '../Model/inscrireModel.dart';
 import 'package:flutter/widgets.dart';
 
 class RegisterView extends StatefulWidget {

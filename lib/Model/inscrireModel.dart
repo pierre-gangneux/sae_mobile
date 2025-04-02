@@ -47,7 +47,7 @@ class RegisterModel {
       dbPath,
       version: 1,
       onCreate: (Database db, int version) async {
-        // La table est déjà supposée exister dans la base, pas besoin de CREATE TABLE ici
+        // Tout est déja initialisé
       },
     );
 
