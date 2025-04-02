@@ -4,6 +4,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../Model/Like.dart';
 import '../Model/Restaurant.dart';
 import '../ViewModels/LikeViewModel.dart';
+import '../ViewModels/connexionViewModel.dart';
 
 class RestaurantDetailView extends StatelessWidget {
   final Restaurant restaurant;
@@ -41,7 +42,7 @@ class RestaurantDetailView extends StatelessWidget {
                       ),*/
                       ElevatedButton(
                         onPressed: () {
-                          Like like = new Like(username: "Lucas doit faire", osmid: restaurant.osmid);
+                          Like like = new Like(username: context.read<ConnexionViewModel>().getUser()!.username, osmid: restaurant.osmid);
                           context.read<LikeViewModel>().addLike(like);
                         },
                         style: ElevatedButton.styleFrom(

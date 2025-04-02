@@ -33,6 +33,9 @@ class LikeRepository{
         like.toMap(),
         conflictAlgorithm: ConflictAlgorithm.replace,
     );
+    like = db.query('RESTAURANT_FAVORIS', "select * from RESTAURANT_FAVORIS;");
+
+    print(like);
   }
 
 

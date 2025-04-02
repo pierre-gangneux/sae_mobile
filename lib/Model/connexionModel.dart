@@ -2,14 +2,32 @@ import 'dart:convert';
 import 'package:crypto/crypto.dart';
 import 'package:sqflite/sqflite.dart';
 
+import 'User.dart';
+
 class LoginModel {
-  String username;
-  String password;
+  String? _username;
+  String? _password;
+  User? _user;
 
   LoginModel({
-    required this.username,
-    required this.password,
-  });
+    String? username,
+    String? password,
+  })  : _username = username,
+        _password = password;
+
+  // Getters
+  String? get username => _username;
+  String? get password => _password;
+  User? get user => _user;
+
+  // Setters
+  set username(String? value) {
+    _username = value;
+  }
+
+  set password(String? value) {
+    _password = value;
+  }
 
   // Hashage
   String hashPassword(String password) {
@@ -26,7 +44,7 @@ class LoginModel {
       },
     );
 
-    String hashedPassword = hashPassword(password);
+    String hashedPassword = hashPassword(_password!);
 
     try {
       // Recherche de l'utilisateur dans la base de données
@@ -36,8 +54,11 @@ class LoginModel {
         whereArgs: [username, hashedPassword],
       );
 
+
+
       if (users.isNotEmpty) {
         // Utilisateur Trouvé
+        _user=new User(username: username!, mdp: hashedPassword, estadmin: false);
         return true;
       } else {
         return false;
@@ -47,4 +68,10 @@ class LoginModel {
       return false;
     }
   }
+
+
+
 }
+
+
+
