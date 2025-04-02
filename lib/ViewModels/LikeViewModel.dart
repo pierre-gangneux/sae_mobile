@@ -1,5 +1,3 @@
-
-
 import 'package:flutter/cupertino.dart';
 import 'package:sae_mobile/Model/listRestaurants.dart';
 import 'package:sqflite/sqflite.dart';
@@ -15,14 +13,10 @@ class LikeViewModel extends ChangeNotifier{
     _likeRepository = LikeRepository(db, _lesRestaurant);
   }
 
-
   void addLike(Like like){
     //print(like.username);
     //print(like.osmid);
     _likeRepository.addLike(like);
     notifyListeners();
   }
-
-
-
 }

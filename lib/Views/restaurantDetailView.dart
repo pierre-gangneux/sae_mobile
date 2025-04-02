@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:sae_mobile/Views/commentSectionView.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../Model/Like.dart';
 import '../Model/Restaurant.dart';
@@ -106,6 +107,8 @@ class RestaurantDetailView extends StatelessWidget {
                       icon: Icon(Icons.map),
                       label: Text("Voir sur Google Maps"),
                     ),
+                  SizedBox(height: 32),
+                  CommentSectionView(),
                 ],
               ),
             ),
