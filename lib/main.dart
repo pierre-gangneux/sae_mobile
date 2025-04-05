@@ -25,7 +25,7 @@ import 'database.dart';
 
 final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'root');
 
-// Cle pour les branch pour essayer de régler une erreur de redirection
+// Cle pour les branch pour essayer de régler une erreur de redirection .
 final GlobalKey<NavigatorState> _homeNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'homeNav');
 final GlobalKey<NavigatorState> _restaurantsNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'restaurantsNav');
 final GlobalKey<NavigatorState> _mapNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'mapNav');
