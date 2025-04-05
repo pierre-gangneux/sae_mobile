@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
@@ -16,19 +15,18 @@ class ConnectionView extends StatefulWidget {
 class _ConnectionViewState extends State<ConnectionView> {
   final _formKey = GlobalKey<FormBuilderState>();
   bool _isPasswordHide = true;
-  bool _isLoading = false;  // Pour indiquer si la requête est en cours
+  bool _isLoading = false;
 
   Future<String> getDatabasePath() async {
     return "${await getDatabasesPath()}/database.db";
   }
 
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Padding(
-          padding: const EdgeInsets.all(8.0),
+        title: const Padding(
+          padding: EdgeInsets.all(8.0),
           child: Text("Se connecter"),
         ),
       ),
@@ -54,7 +52,7 @@ class _ConnectionViewState extends State<ConnectionView> {
                       decoration: InputDecoration(
                         labelText: 'Mot de passe',
                         suffixIcon: IconButton(
-                          icon: Icon(_isPasswordHide ? Icons.visibility : Icons.visibility_off),
+                          icon: Icon(_isPasswordHide ? Icons.visibility_off : Icons.visibility),
                           onPressed: () {
                             setState(() {
                               _isPasswordHide = !_isPasswordHide;
@@ -64,51 +62,52 @@ class _ConnectionViewState extends State<ConnectionView> {
                       ),
                       validator: FormBuilderValidators.required(errorText: "Le champ est obligatoire"),
                     ),
-                    const SizedBox(height: 10),
                   ],
                 ),
               ),
-              const SizedBox(height: 20),
-              Row(
-                children: [
-                  ElevatedButton(
-                    onPressed: () async {
-                      final String dbPath = await getDatabasePath(); // Obtenir le chemin de la base de données
-                      if (_formKey.currentState!.validate()) {
-                        setState(() {
-                          _isLoading = true;
-                        });
-                        String username = _formKey.currentState?.fields['username']?.value;
-                        String password = _formKey.currentState?.fields['password']?.value;
+              const SizedBox(height: 30),
+              ElevatedButton(
+                onPressed: () async {
+                  final String dbPath = await getDatabasePath();
 
-                        LoginModel loginModel = LoginModel(username: username, password: password);
+                  if (_formKey.currentState!.validate()) {
+                    setState(() {
+                      _isLoading = true;
+                    });
 
-                        // Appeler la méthode loginUser pour vérifier l'utilisateur
-                        bool isConnected = await loginModel.loginUser(context, dbPath);
+                    String username = _formKey.currentState?.fields['username']?.value;
+                    String password = _formKey.currentState?.fields['password']?.value;
 
-                        setState(() {
-                          _isLoading = false;
-                        });
+                    LoginModel loginModel = LoginModel(username: username, password: password);
 
-                        if (isConnected) {
-                          // L'utilisateur est connecté
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text('Connexion réussie pour $username')),
-                          );
-                          // Rediriger vers la page principale ou autre page après connexion
-                          context.go('/home');
-                        } else {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text('Nom d\'utilisateur ou mot de passe incorrect')),
-                          );
-                        }
-                      }
-                    },
-                    child: _isLoading
-                        ? CircularProgressIndicator(color: Colors.white)
-                        : const Text('Se connecter'),
-                  ),
-                ],
+                    bool isConnected = await loginModel.loginUser(context, dbPath);
+
+                    setState(() {
+                      _isLoading = false;
+                    });
+
+                    if (isConnected) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('Connexion réussie pour $username')),
+                      );
+                      context.go('/home');
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text("Nom d'utilisateur ou mot de passe incorrect")),
+                      );
+                    }
+                  }
+                },
+                child: _isLoading
+                    ? const CircularProgressIndicator(color: Colors.white)
+                    : const Text('Se connecter'),
+              ),
+              const SizedBox(height: 10),
+              TextButton(
+                onPressed: () {
+                  context.go('/profile/register');
+                },
+                child: const Text("S'inscrire"),
               ),
             ],
           ),
