@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 import '../../Model/Avis/avis.dart';
@@ -49,7 +50,8 @@ Widget avisFormCard({
   required GlobalKey<FormBuilderState> formKey,
   required Future<List<Avis>> avisFuture,
   required String username,
-  required String osmid
+  required String osmid,
+  String? title
 }) {
   return FutureBuilder<List<Avis>>(
     future: avisFuture,
@@ -60,7 +62,7 @@ Widget avisFormCard({
         return Center(child: Text("Erreur lors du chargement de l'avis"));
       }
 
-      Avis? avis = snapshot.hasData ? avisUser(snapshot.data!, username) : null;
+      Avis? avis = snapshot.hasData ? avisUser(snapshot.data!, username, osmid) : null;
 
       return Card(
         margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
@@ -73,8 +75,18 @@ Widget avisFormCard({
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                (title != null) ?
+                GestureDetector(
+                  onTap: () {
+                    context.push('/restaurants/$osmid');
+                  },
+                  child: Text(
+                    title,
+                    style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                ) :
                 Text(
-                  avis != null ? "Modifier votre avis" : "Laisser un avis",
+                  (avis != null) ? "Modifier votre avis" : "Laisser un avis",
                   style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 16),
@@ -177,9 +189,9 @@ Widget avisFormCard({
   );
 }
 
-Avis? avisUser(List<Avis> avisList, String username){
+Avis? avisUser(List<Avis> avisList, String username, String osmid){
   for (Avis avis in avisList){
-    if (avis.username == username){
+    if (avis.username == username && avis.osmid == osmid){
       return avis;
     }
   }

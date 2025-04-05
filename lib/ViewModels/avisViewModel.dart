@@ -5,7 +5,6 @@ import '../Model/Avis/avisRepository.dart';
 import '../Model/Avis/avis.dart';
 
 import '../Model/Restaurant/Restaurant.dart';
-import '../Model/User.dart';
 
 class AvisViewModel extends ChangeNotifier{
   late AvisRepository _avisRepository;
@@ -14,8 +13,8 @@ class AvisViewModel extends ChangeNotifier{
     _avisRepository = AvisRepository(db);
   }
 
-  Future<List<Avis>> getAvisUser(User user) async{
-    List<Avis> avis = await _avisRepository.getAvisUser(user);
+  Future<List<Avis>> getAvisUser(String username) async{
+    List<Avis> avis = await _avisRepository.getAvisUser(username);
     return avis;
   }
 

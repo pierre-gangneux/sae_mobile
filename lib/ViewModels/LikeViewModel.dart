@@ -4,7 +4,6 @@ import '../Model/Like/Like.dart';
 import '../Model/Like/LikeRepository.dart';
 import '../Model/Restaurant/Restaurant.dart';
 import '../Model/Restaurant/restaurantRepository.dart';
-import '../Model/User.dart';
 
 class LikeViewModel extends ChangeNotifier{
   late LikeRepository _likeRepository;
@@ -18,8 +17,6 @@ class LikeViewModel extends ChangeNotifier{
   }
 
   void addLike(Like like){
-    //print(like.username);
-    //print(like.osmid);
     _likeRepository.addLike(like);
     notifyListeners();
   }
@@ -32,6 +29,4 @@ class LikeViewModel extends ChangeNotifier{
   Future<List<Restaurant>> getLike(String username) {
     return _likeRepository.getLike(_db, username);
   }
-
-
 }

@@ -1,7 +1,6 @@
 import 'package:sqflite/sqflite.dart';
 
 import '../Restaurant/Restaurant.dart';
-import '../User.dart';
 import 'avis.dart';
 
 
@@ -10,26 +9,31 @@ class AvisRepository{
 
   const AvisRepository(this.db);
 
-  Future<List<Avis>> getAvisUser(User user) async {
-    // Exécuter la requête pour récupérer les données de la table AVIS pour l'utilisateur
-    List<Map<String, dynamic>> result = await this.db.rawQuery(
-        'SELECT osmid, note, commentaire FROM AVIS WHERE username=${user.username};'
+  Future<List<Avis>> getAvisUser(String username) async {
+    List<Map<String, dynamic>> result = await db.query(
+      'AVIS',
+      columns: [
+        'osmid', 'note', 'commentaire'
+      ],
+      where: 'username = ?',
+      whereArgs: [username]
     );
-
     List<Avis> avis = result.map((row) {
-      Avis avis = Avis(user.username, row['osmid'], row['note'], row['commentaire']);
+      Avis avis = Avis(username, row['osmid'], row['note'], row['commentaire']);
       return avis;
     }).toList();
     return avis;
   }
 
   Future<List<Avis>> getAvisRestaurants(Restaurant restaurant) async {
-    // Exécuter la requête pour récupérer les données de la table AVIS pour les restaurants
-    List<Map<String, dynamic>> result = await this.db.rawQuery(
-        'SELECT username, note, commentaire FROM AVIS WHERE osmid=${restaurant.osmid};'
+    List<Map<String, dynamic>> result = await db.query(
+      'AVIS',
+      columns: [
+        'username', 'note', 'commentaire'
+      ],
+      where: 'osmid = ?',
+      whereArgs: [restaurant.osmid]
     );
-
-    // Convertir les résultats en instances de Restaurant
     List<Avis> avis = result.map((row) {
       return Avis(row['username'], restaurant.osmid, row['note'], row['commentaire']);
     }).toList();

@@ -89,19 +89,13 @@ class MyApp extends StatelessWidget {
                 routes: [
                   GoRoute(
                     path: ':id',
-                    // Chemin enfant dynamique pour le détail du restaurant
                     builder: (BuildContext context, GoRouterState state) {
                       final String restaurantId = state.pathParameters['id']!;
-                      // Récupérer l'objet Restaurant en fonction de l'ID via Provider
                       final restaurantViewModel = Provider.of<RestaurantViewModel>(context, listen: false);
                       final restaurant = restaurantViewModel.getRestaurantById(restaurantId);
-
                       if (restaurant == null) {
                         return Scaffold(body: Center(child: Text('Restaurant non trouvé')));
                       }
-                      debugPrint('RestaurantDetailView construit pour l\'ID: $restaurantId');
-
-                      // Passer l'objet Restaurant au widget RestaurantDetailView
                       return RestaurantDetailView(restaurant: restaurant);
                     },
                   ),
