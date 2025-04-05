@@ -3,8 +3,8 @@ import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sqflite/sqflite.dart';
+import 'package:shared_preferences/shared_preferences.dart';  // Importer shared_preferences
 import '../Model/Connexion/inscrireModel.dart';
-import 'package:flutter/widgets.dart';
 
 class RegisterView extends StatefulWidget {
   const RegisterView({super.key});
@@ -24,6 +24,12 @@ class _RegisterViewState extends State<RegisterView> {
     return "${await getDatabasesPath()}/database.db";
   }
 
+  // Méthode pour enregistrer l'état de la session
+  Future<void> _saveUserSession() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('isLoggedIn', true);  // Marque l'utilisateur comme connecté
+  }
+
   Future<void> _registerAndNavigate() async {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
@@ -36,10 +42,14 @@ class _RegisterViewState extends State<RegisterView> {
       bool success = await _registerModel.registerUser(dbPath);
       if (success) {
         if (mounted) {
+          // Sauvegarder l'état de la session après l'inscription réussie
+          await _saveUserSession();
+
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Inscription réussie')),
           );
-          context.go('/Connexion');
+          print("Inscription réussie, redirection vers /connexion");
+          context.go('/connexion');  // Redirection vers la page de connexion
         }
       } else {
         if (mounted) {
@@ -158,12 +168,12 @@ class _RegisterViewState extends State<RegisterView> {
                 ),
                 const SizedBox(height: 20),
                 ElevatedButton(
-                  onPressed: _registerAndNavigate,
+                  onPressed: _registerAndNavigate,  // Appel de la méthode ici
                   child: const Text('S\'enregistrer'),
                 ),
-                const SizedBox(height: 10),// Faire un espace
+                const SizedBox(height: 10),
                 TextButton(
-                  onPressed: () => context.go('/Connexion'),
+                  onPressed: () => context.go('/connexion'),
                   child: const Text("Déjà un compte ? Se connecter"),
                 ),
               ],
