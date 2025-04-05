@@ -7,6 +7,7 @@ import 'package:sae_mobile/Views/Profil/favorisView.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:sqflite_common_ffi_web/sqflite_ffi_web.dart';
 import 'Model/authentification.dart';
+import 'ViewModels/connexionViewModel.dart';
 import 'Views/connectionView.dart';
 import 'ViewModels/LikeViewModel.dart';
 import 'ViewModels/cuisineViewModel.dart';
@@ -87,8 +88,10 @@ class MyApp extends StatelessWidget {
                 routes: [
                   GoRoute(
                     path: ':id',
+                    // Chemin enfant dynamique pour le détail du restaurant
                     builder: (BuildContext context, GoRouterState state) {
                       final String restaurantId = state.pathParameters['id']!;
+                      // Récupérer l'objet Restaurant en fonction de l'ID via Provider
                       final restaurantViewModel = Provider.of<RestaurantViewModel>(context);
                       final restaurant = restaurantViewModel.getRestaurantById(restaurantId);
 
@@ -96,6 +99,7 @@ class MyApp extends StatelessWidget {
                         return Scaffold(body: Center(child: Text('Restaurant non trouvé')));
                       }
 
+                      // Passer l'objet Restaurant au widget RestaurantDetailView
                       return RestaurantDetailView(restaurant: restaurant);
                     },
                   ),
@@ -131,17 +135,18 @@ class MyApp extends StatelessWidget {
           ),
         ],
       ),
+      // Route pour la page d'inscription
       GoRoute(
         path: '/register',
         builder: (BuildContext context, GoRouterState state) => const RegisterView(),
       ),
+      // Route pour la page de connexion
       GoRoute(
         path: '/connexion',
         builder: (BuildContext context, GoRouterState state) => const ConnectionView(),
       ),
     ],
   );
-
 
   @override
   Widget build(BuildContext context) {
@@ -160,6 +165,11 @@ class MyApp extends StatelessWidget {
             create: (_) {
               CuisineViewModel cuisineViewModel = CuisineViewModel(database!);
               return cuisineViewModel;
+            }),
+        ChangeNotifierProvider(
+            create: (_) {
+              ConnexionViewModel connexionViewModel = ConnexionViewModel();
+              return connexionViewModel;
             })
       ],
       child: Consumer<RestaurantViewModel>(

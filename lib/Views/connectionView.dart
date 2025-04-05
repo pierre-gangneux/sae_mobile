@@ -3,8 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 import 'package:sqflite/sqflite.dart';
 import '../Model/connexionModel.dart';
+import '../ViewModels/connexionViewModel.dart';
+
 
 class ConnectionView extends StatefulWidget {
   const ConnectionView({super.key});
@@ -80,11 +83,13 @@ class _ConnectionViewState extends State<ConnectionView> {
                         });
                         String username = _formKey.currentState?.fields['username']?.value;
                         String password = _formKey.currentState?.fields['password']?.value;
+                        context.read<ConnexionViewModel>().setUsername(username);
+                        context.read<ConnexionViewModel>().setPassword(password);
 
                         LoginModel loginModel = LoginModel(username: username, password: password);
 
                         // Appeler la méthode loginUser pour vérifier l'utilisateur
-                        bool isConnected = await loginModel.loginUser(context, dbPath);
+                        bool isConnected = await context.read<ConnexionViewModel>().loginUser(context, dbPath);
 
                         setState(() {
                           _isLoading = false;

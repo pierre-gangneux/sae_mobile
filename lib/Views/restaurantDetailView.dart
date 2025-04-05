@@ -4,14 +4,18 @@ import 'package:url_launcher/url_launcher.dart';
 import '../Model/Like.dart';
 import '../Model/Restaurant.dart';
 import '../ViewModels/LikeViewModel.dart';
+import '../ViewModels/connexionViewModel.dart';
 
 class RestaurantDetailView extends StatelessWidget {
   final Restaurant restaurant;
+
 
   const RestaurantDetailView({super.key, required this.restaurant});
 
   @override
   Widget build(BuildContext context) {
+    final username = context.read<ConnexionViewModel>().getUsername()!;
+    final likeViewModel = context.watch<LikeViewModel>();
     return Scaffold(
       appBar: AppBar(
         title: Text(restaurant.nomRestaurant),
@@ -33,44 +37,72 @@ class RestaurantDetailView extends StatelessWidget {
                         restaurant.nomRestaurant,
                         style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
                       ),
-                      /*Row(
-                        children: List.generate(
-                          restaurant.etoiles,
-                              (index) => Icon(Icons.star, color: Colors.amber),
-                        ),
-                      ),*/
-                      ElevatedButton(
-                        onPressed: () {
-                          Like like = new Like(username: "Lucas doit faire", osmid: restaurant.osmid);
-                          context.read<LikeViewModel>().addLike(like);
-                        },
-                        style: ElevatedButton.styleFrom(
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8), // Facultatif pour arrondir
-                          ),
-                          padding: EdgeInsets.all(12), // Ajuste l'espace interne
-                        ),
-                        child: Icon(Icons.favorite),
-                      ),
 
+
+                      // Bouton Like
+                      FutureBuilder<List<Restaurant?>>(
+
+                        future: likeViewModel.getLike(username),
+                        builder: (context, snapshot) {
+                          final likedRestaurants = snapshot.data ?? [];
+                          final isLiked = likedRestaurants.any(
+                                (like) => like!.osmid == restaurant.osmid,
+                          );
+
+                          return ElevatedButton(
+                            onPressed: () {
+                              Like like = Like(username: username, osmid: restaurant.osmid);
+                              if (isLiked) {
+                                likeViewModel.removeLike(like);
+                              } else {
+                                likeViewModel.addLike(like);
+                              }
+                            },
+                            child: Icon(
+                              Icons.favorite,
+                              color: isLiked ? Colors.red : Colors.grey,
+                            ),
+                            style: ElevatedButton.styleFrom(
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              padding: EdgeInsets.all(12),
+                              backgroundColor: isLiked ? Colors.red[100] : Colors.grey[200],
+                            ),
+                          );
+                        },
+                      )
 
                     ],
                   ),
+
                   SizedBox(height: 8),
 
                   // Téléphone et site internet
                   if (restaurant.telephone != null)
-                    _buildInfoRow(Icons.phone, restaurant.telephone!, onTap: () {
-                      launchUrl(Uri.parse("tel:${restaurant.telephone}"));
-                    }),
+                    _buildInfoRow(
+                      Icons.phone,
+                      restaurant.telephone!,
+                      onTap: () {
+                        launchUrl(Uri.parse("tel:${restaurant.telephone}"));
+                      },
+                    ),
                   if (restaurant.siteInternet != null)
-                    _buildInfoRow(Icons.language, "Site web", onTap: () {
-                      launchUrl(Uri.parse(restaurant.siteInternet!));
-                    }),
+                    _buildInfoRow(
+                      Icons.language,
+                      "Site web",
+                      onTap: () {
+                        launchUrl(Uri.parse(restaurant.siteInternet!));
+                      },
+                    ),
                   if (restaurant.facebook != null)
-                    _buildInfoRow(Icons.facebook, "Facebook", onTap: () {
-                      launchUrl(Uri.parse(restaurant.facebook!));
-                    }),
+                    _buildInfoRow(
+                      Icons.facebook,
+                      "Facebook",
+                      onTap: () {
+                        launchUrl(Uri.parse(restaurant.facebook!));
+                      },
+                    ),
 
                   SizedBox(height: 16),
 
@@ -94,6 +126,7 @@ class RestaurantDetailView extends StatelessWidget {
                       if (restaurant.fauteuilRoulant == "yes") _buildChip("Accès PMR"),
                     ],
                   ),
+
                   SizedBox(height: 16),
 
                   // Localisation
@@ -108,6 +141,7 @@ class RestaurantDetailView extends StatelessWidget {
                     ),
                 ],
               ),
+
             ),
           ],
         ),

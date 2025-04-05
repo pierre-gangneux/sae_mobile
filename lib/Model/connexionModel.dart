@@ -6,12 +6,12 @@ import 'package:provider/provider.dart';
 import 'authentification.dart'; // Assurez-vous d'importer AuthState
 
 class LoginModel {
-  String username;
-  String password;
+  String? username;
+  String? password;
 
   LoginModel({
-    required this.username,
-    required this.password,
+    this.username,
+    this.password,
   });
 
   // Hashage
@@ -29,7 +29,7 @@ class LoginModel {
       },
     );
 
-    String hashedPassword = hashPassword(password);
+    String hashedPassword = hashPassword(password!);
 
     try {
       // Recherche de l'utilisateur dans la base de données
