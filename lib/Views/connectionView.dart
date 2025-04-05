@@ -5,7 +5,7 @@ import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:sqflite/sqflite.dart';
-import '../Model/connexionModel.dart';
+import '../Model/Connexion/connexionModel.dart';
 import '../ViewModels/connexionViewModel.dart';
 
 

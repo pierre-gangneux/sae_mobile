@@ -1,9 +1,10 @@
 import 'package:sqflite/sqflite.dart';
 
+import '../Restaurant/listRestaurants.dart';
 import 'Like.dart';
-import 'Restaurant.dart';
-import 'User.dart';
-import 'listRestaurants.dart';
+import '../Restaurant/Restaurant.dart';
+import '../User.dart';
+
 
 
 class LikeRepository{

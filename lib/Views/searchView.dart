@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:provider/provider.dart';
-import 'package:sae_mobile/Model/CuisineRepository.dart';
 import 'package:sae_mobile/Views/viewRestaurant.dart';
 
 import '../ViewModels/cuisineViewModel.dart';

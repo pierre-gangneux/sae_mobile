@@ -1,13 +1,5 @@
-
-
 import 'package:flutter/cupertino.dart';
-import 'package:sae_mobile/Model/listRestaurants.dart';
-import 'package:sqflite/sqflite.dart';
-
-import '../Model/Like.dart';
-import '../Model/LikeRepository.dart';
-import '../Model/User.dart';
-import '../Model/connexionModel.dart';
+import '../Model/Connexion/connexionModel.dart';
 
 class ConnexionViewModel extends ChangeNotifier{
   late LoginModel connexion;
