@@ -5,12 +5,30 @@ import '../Model/Like/Like.dart';
 import '../Model/Restaurant/Restaurant.dart';
 import '../ViewModels/LikeViewModel.dart';
 import '../ViewModels/connexionViewModel.dart';
+import '../ViewModels/restaurantViewModel.dart';
 
-class RestaurantDetailView extends StatelessWidget {
+class RestaurantDetailView extends StatefulWidget {
   final Restaurant restaurant;
 
 
   const RestaurantDetailView({super.key, required this.restaurant});
+
+  @override
+  State<RestaurantDetailView> createState() => _RestaurantDetailViewState();
+}
+
+class _RestaurantDetailViewState extends State<RestaurantDetailView> {
+  @override
+  void initState() {
+    super.initState();
+
+    // Utiliser addPostFrameCallback pour exécuter le code après que l'arbre des widgets soit complètement construit
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      // Sauvegarder le restaurant dans le modèle lorsque la page est initialisée
+      final restaurantViewModel = Provider.of<RestaurantViewModel>(context, listen: false);
+      restaurantViewModel.saveRestaurant(widget.restaurant.osmid);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -18,7 +36,7 @@ class RestaurantDetailView extends StatelessWidget {
     final likeViewModel = context.watch<LikeViewModel>();
     return Scaffold(
       appBar: AppBar(
-        title: Text(restaurant.nomRestaurant),
+        title: Text(widget.restaurant.nomRestaurant),
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -34,7 +52,7 @@ class RestaurantDetailView extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        restaurant.nomRestaurant,
+                        widget.restaurant.nomRestaurant,
                         style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
                       ),
 
@@ -46,12 +64,12 @@ class RestaurantDetailView extends StatelessWidget {
                         builder: (context, snapshot) {
                           final likedRestaurants = snapshot.data ?? [];
                           final isLiked = likedRestaurants.any(
-                                (like) => like!.osmid == restaurant.osmid,
+                                (like) => like!.osmid == widget.restaurant.osmid,
                           );
 
                           return ElevatedButton(
                             onPressed: () {
-                              Like like = Like(username: username, osmid: restaurant.osmid);
+                              Like like = Like(username: username, osmid: widget.restaurant.osmid);
                               if (isLiked) {
                                 likeViewModel.removeLike(like);
                               } else {
@@ -79,28 +97,28 @@ class RestaurantDetailView extends StatelessWidget {
                   SizedBox(height: 8),
 
                   // Téléphone et site internet
-                  if (restaurant.telephone != null)
+                  if (widget.restaurant.telephone != null)
                     _buildInfoRow(
                       Icons.phone,
-                      restaurant.telephone!,
+                      widget.restaurant.telephone!,
                       onTap: () {
-                        launchUrl(Uri.parse("tel:${restaurant.telephone}"));
+                        launchUrl(Uri.parse("tel:${widget.restaurant.telephone}"));
                       },
                     ),
-                  if (restaurant.siteInternet != null)
+                  if (widget.restaurant.siteInternet != null)
                     _buildInfoRow(
                       Icons.language,
                       "Site web",
                       onTap: () {
-                        launchUrl(Uri.parse(restaurant.siteInternet!));
+                        launchUrl(Uri.parse(widget.restaurant.siteInternet!));
                       },
                     ),
-                  if (restaurant.facebook != null)
+                  if (widget.restaurant.facebook != null)
                     _buildInfoRow(
                       Icons.facebook,
                       "Facebook",
                       onTap: () {
-                        launchUrl(Uri.parse(restaurant.facebook!));
+                        launchUrl(Uri.parse(widget.restaurant.facebook!));
                       },
                     ),
 
@@ -116,25 +134,25 @@ class RestaurantDetailView extends StatelessWidget {
                   Wrap(
                     spacing: 10,
                     children: [
-                      if (restaurant.vegetarien == "yes") _buildChip("Végétarien"),
-                      if (restaurant.vegan == "yes") _buildChip("Vegan"),
-                      if (restaurant.livraison == "yes") _buildChip("Livraison"),
-                      if (restaurant.aEmporter == "yes") _buildChip("À Emporter"),
-                      if (restaurant.drive == "yes") _buildChip("Drive"),
-                      if (restaurant.accessInternet == "yes") _buildChip("Wi-Fi Gratuit"),
-                      if (restaurant.espaceFumeur == "yes") _buildChip("Espace Fumeur"),
-                      if (restaurant.fauteuilRoulant == "yes") _buildChip("Accès PMR"),
+                      if (widget.restaurant.vegetarien == "yes") _buildChip("Végétarien"),
+                      if (widget.restaurant.vegan == "yes") _buildChip("Vegan"),
+                      if (widget.restaurant.livraison == "yes") _buildChip("Livraison"),
+                      if (widget.restaurant.aEmporter == "yes") _buildChip("À Emporter"),
+                      if (widget.restaurant.drive == "yes") _buildChip("Drive"),
+                      if (widget.restaurant.accessInternet == "yes") _buildChip("Wi-Fi Gratuit"),
+                      if (widget.restaurant.espaceFumeur == "yes") _buildChip("Espace Fumeur"),
+                      if (widget.restaurant.fauteuilRoulant == "yes") _buildChip("Accès PMR"),
                     ],
                   ),
 
                   SizedBox(height: 16),
 
                   // Localisation
-                  if (restaurant.latitude != null && restaurant.longitude != null)
+                  if (widget.restaurant.latitude != null && widget.restaurant.longitude != null)
                     ElevatedButton.icon(
                       onPressed: () {
                         launchUrl(Uri.parse(
-                            "https://www.google.com/maps/search/?api=1&query=${restaurant.latitude},${restaurant.longitude}"));
+                            "https://www.google.com/maps/search/?api=1&query=${widget.restaurant.latitude},${widget.restaurant.longitude}"));
                       },
                       icon: Icon(Icons.map),
                       label: Text("Voir sur Google Maps"),
