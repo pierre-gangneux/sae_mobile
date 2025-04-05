@@ -148,7 +148,6 @@ class MyApp extends StatelessWidget {
     ],
   );
 
-
   @override
   Widget build(BuildContext context) {
     RestaurantViewModel restaurantViewModel = RestaurantViewModel(database!);

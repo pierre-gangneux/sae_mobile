@@ -86,6 +86,7 @@ class _ConnectionViewState extends State<ConnectionView> {
                         context.read<ConnexionViewModel>().setUsername(username);
                         context.read<ConnexionViewModel>().setPassword(password);
 
+                        LoginModel loginModel = LoginModel(username: username, password: password);
 
                         // Appeler la méthode loginUser pour vérifier l'utilisateur
                         bool isConnected = await context.read<ConnexionViewModel>().loginUser(context, dbPath);
