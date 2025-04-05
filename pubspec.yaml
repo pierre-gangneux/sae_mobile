@@ -49,6 +49,9 @@ dependencies:
   crypto: ^3.0.3 #Pour le hashage
   settings_ui: ^2.0.2
   shared_preferences: ^2.5.3
+  build_runner: ^2.4.15
+  build: ^2.4.2
+  mockito: ^5.4.5
 
 dev_dependencies:
   flutter_test:
