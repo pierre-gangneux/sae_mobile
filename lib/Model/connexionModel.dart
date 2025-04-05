@@ -1,33 +1,18 @@
 import 'dart:convert';
 import 'package:crypto/crypto.dart';
 import 'package:sqflite/sqflite.dart';
-
-import 'User.dart';
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'authentification.dart'; // Assurez-vous d'importer AuthState
 
 class LoginModel {
-  String? _username;
-  String? _password;
-  User? _user;
+  String? username;
+  String? password;
 
   LoginModel({
-    String? username,
-    String? password,
-  })  : _username = username,
-        _password = password;
-
-  // Getters
-  String? get username => _username;
-  String? get password => _password;
-  User? get user => _user;
-
-  // Setters
-  set username(String? value) {
-    _username = value;
-  }
-
-  set password(String? value) {
-    _password = value;
-  }
+    this.username,
+    this.password,
+  });
 
   // Hashage
   String hashPassword(String password) {
@@ -35,7 +20,7 @@ class LoginModel {
   }
 
   // Vérifie les informations d'identification dans la base de données
-  Future<bool> loginUser(String dbPath) async {
+  Future<bool> loginUser(BuildContext context, String dbPath) async {
     final Database db = await openDatabase(
       dbPath,
       version: 1,
@@ -44,7 +29,7 @@ class LoginModel {
       },
     );
 
-    String hashedPassword = hashPassword(_password!);
+    String hashedPassword = hashPassword(password!);
 
     try {
       // Recherche de l'utilisateur dans la base de données
@@ -54,11 +39,9 @@ class LoginModel {
         whereArgs: [username, hashedPassword],
       );
 
-
-
       if (users.isNotEmpty) {
-        // Utilisateur Trouvé
-        _user=new User(username: username!, mdp: hashedPassword, estadmin: false);
+        // Utilisateur trouvé, mettre à jour l'état de connexion
+        Provider.of<AuthState>(context, listen: false).signIn();
         return true;
       } else {
         return false;
@@ -68,10 +51,4 @@ class LoginModel {
       return false;
     }
   }
-
-
-
 }
-
-
-

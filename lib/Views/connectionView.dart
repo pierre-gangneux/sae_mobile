@@ -8,6 +8,7 @@ import 'package:sqflite/sqflite.dart';
 import '../Model/connexionModel.dart';
 import '../ViewModels/connexionViewModel.dart';
 
+
 class ConnectionView extends StatefulWidget {
   const ConnectionView({super.key});
 
@@ -87,7 +88,7 @@ class _ConnectionViewState extends State<ConnectionView> {
 
 
                         // Appeler la méthode loginUser pour vérifier l'utilisateur
-                        bool isConnected = await context.read<ConnexionViewModel>().loginUser(dbPath);
+                        bool isConnected = await context.read<ConnexionViewModel>().loginUser(context, dbPath);
 
                         setState(() {
                           _isLoading = false;

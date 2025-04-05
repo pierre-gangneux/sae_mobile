@@ -30,8 +30,6 @@ class LikeViewModel extends ChangeNotifier{
 
   void removeLike(Like like){
     _likeRepository.removeLike(like);
-    print(like);
-    print("remove");
     notifyListeners();
   }
 

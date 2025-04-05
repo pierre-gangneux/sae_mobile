@@ -36,8 +36,6 @@ class LikeRepository{
         like.toMap(),
         conflictAlgorithm: ConflictAlgorithm.replace,
     );
-
-    print(await this.getLike(db, like.username));
   }
 
   Future<void> removeLike(Like like) async {
@@ -46,9 +44,6 @@ class LikeRepository{
       where: 'username = ? AND osmid = ?',
       whereArgs: [like.username, like.osmid],
     );
-
-    // Affichage pour vérifier le résultat
-    print(await this.getLike(db, like.username));
   }
 
 

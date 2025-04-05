@@ -14,29 +14,28 @@ class ConnexionViewModel extends ChangeNotifier{
 
   ConnexionViewModel(){
     connexion = new LoginModel();
+    notifyListeners();
   }
 
   setUsername(String username){
     connexion.username = username;
+    notifyListeners();
   }
 
   setPassword(String password){
     connexion.password = password;
+    notifyListeners();
   }
 
-  loginUser(String dbPath) async {
-    bool co = await connexion.loginUser(dbPath);
+  loginUser(BuildContext context, String dbPath) async {
+    bool co = await connexion.loginUser(context, dbPath);
     notifyListeners();
     return co;
   }
 
-  User? getUser(){
-    return connexion.user;
+  String? getUsername(){
+    return connexion.username;
   }
-
-
-
-
 
 
 }

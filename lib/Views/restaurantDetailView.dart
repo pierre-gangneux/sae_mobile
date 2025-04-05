@@ -14,7 +14,7 @@ class RestaurantDetailView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final user = context.read<ConnexionViewModel>().getUser()!;
+    final username = context.read<ConnexionViewModel>().getUsername()!;
     final likeViewModel = context.watch<LikeViewModel>();
     return Scaffold(
       appBar: AppBar(
@@ -42,7 +42,7 @@ class RestaurantDetailView extends StatelessWidget {
                       // Bouton Like
                       FutureBuilder<List<Restaurant?>>(
 
-                        future: likeViewModel.getLike(user.username),
+                        future: likeViewModel.getLike(username),
                         builder: (context, snapshot) {
                           final likedRestaurants = snapshot.data ?? [];
                           final isLiked = likedRestaurants.any(
@@ -51,7 +51,7 @@ class RestaurantDetailView extends StatelessWidget {
 
                           return ElevatedButton(
                             onPressed: () {
-                              Like like = Like(username: user.username, osmid: restaurant.osmid);
+                              Like like = Like(username: username, osmid: restaurant.osmid);
                               if (isLiked) {
                                 likeViewModel.removeLike(like);
                               } else {
