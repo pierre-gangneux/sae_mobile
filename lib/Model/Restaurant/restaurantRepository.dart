@@ -1,13 +1,17 @@
+import 'package:sae_mobile/Model/Cuisine/Cuisine.dart';
 import 'package:sqflite/sqflite.dart';
 
+import '../../ViewModels/cuisineViewModel.dart';
+import '../Cuisine/CuisineRepository.dart';
 import 'Restaurant.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-class ListRestaurants{
+class RestaurantRepository{
 
   List<Restaurant> _currentRestaurants;
   List<Restaurant> _lesRestaurants;
 
-  ListRestaurants() : _lesRestaurants = [], _currentRestaurants = [];
+  RestaurantRepository() : _lesRestaurants = [], _currentRestaurants = [];
 
   List<Restaurant> get lesRestaurants => _lesRestaurants;
   List<Restaurant> get currentRestaurants => _currentRestaurants;
@@ -43,49 +47,37 @@ class ListRestaurants{
     }).toList();
     _lesRestaurants = restaurants;
     _currentRestaurants = restaurants;
-    return restaurants;
-  }
-
-  // Méthode pour générer des restaurants d'exemple
-  List<Restaurant> generateRestaurant(int i) {
-    List<Restaurant> restaurants = [];
-    for (int n = 0; n < i; n++) {
-      restaurants.add(
-        Restaurant(
-          osmid: n.toString(),
-          nomRestaurant: "Restaurant Exemple",
-          type: "Restaurant",
-          etoiles: 5,
-          telephone: "0102030405",
-          siteInternet: "https://www.restaurantexemple.com",
-          facebook: "https://www.facebook.com/restaurantexemple",
-          vegetarien: "yes",
-          vegan: "no",
-          livraison: "yes",
-          latitude: "48.8566",
-          longitude: "2.3522",
-        ),
-      );
-    }
-    _lesRestaurants = restaurants;
-    _currentRestaurants = restaurants;
 
     return restaurants;
   }
+
 
 
   Restaurant? getRestaurantById(String id) {
-    return lesRestaurants.firstWhere((restaurant) => restaurant.osmid == id, orElse: null);
+    for (var restaurant in lesRestaurants) {
+      if (restaurant.osmid == id) {
+        return restaurant;
+      }
+    }
+    return null;
   }
 
 
-  void setRestaurantFiltre(String? nomRestau, String? categorie, List<String>?options) {
+
+
+
+  Future<void> setRestaurantFiltre(Database db, String? nomRestau, String? categorie, List<String>?options, List<String>? selectCuisines, CuisineRepository? injectedCR) async { // Paramètre optionnel pour l'injection test
+    // Si injectedCR est null, on crée une nouvelle instance de CuisineRepository
+    CuisineRepository CR = injectedCR ?? CuisineRepository(db);
     List<Restaurant> res = [];
     for (Restaurant restau in _lesRestaurants) {
+      await CR.loadCuisinesRestaurant(restau);
+      List<String> cuisinesRestau = CR.getCuisinesRestaurant();
       if (
-      (nomRestau == null || restau.nomRestaurant.toLowerCase().contains(nomRestau.toLowerCase()))
+      (nomRestau == null || restau.nomRestaurant.toLowerCase().contains(nomRestau.toLowerCase()) )
       && (categorie == null || sameCategorie(categorie, restau.type))
       && (options == null || optionPresent(restau, options))
+      && cuisinePresent(cuisinesRestau ,selectCuisines)
       ) {
         res.add(restau);
       }
@@ -108,7 +100,6 @@ class ListRestaurants{
   }
 
   bool optionPresent(Restaurant restau, List<String> options) {
-    print(restau.fauteuilRoulant);
     if (options.contains("vegetarien") && (restau.vegetarien != "yes")) return false;
     if (options.contains("vegan") && (restau.vegan != "yes")) return false;
     if (options.contains("espaceFumeur") && (restau.espaceFumeur != "yes")) return false;
@@ -119,6 +110,48 @@ class ListRestaurants{
     if (options.contains("fauteuilroulant") && (restau.fauteuilRoulant != "yes")) return false;
 
     return true; // Si aucune condition n'a retourné false, alors toutes les options sont respectées.
+  }
+
+  bool cuisinePresent(List<String> cuisines, List<String>? selectCuisines) {
+    if (selectCuisines == null || selectCuisines.isEmpty) {
+      return true; // Aucun filtre appliqué sur les cuisines
+    }
+
+    for (String selected in selectCuisines) {
+      if (cuisines.contains(selected)) {
+        return true; // Une correspondance trouvée
+      }
+    }
+    return false; // Aucune correspondance trouvée
+  }
+
+
+
+  void saveRestaurant(String osmid) async {
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+
+    List<String> viewedRestaurants = await this.getViewedOsmid();
+
+    // Si le restaurant existe déjà, on le supprime de la liste avant de le remettre au début
+    if (viewedRestaurants.contains(osmid)) {
+      viewedRestaurants.remove(osmid);  // Supprime l'élément existant
+    }
+
+    // Ajouter le restaurant (osmid) au début de la liste
+    viewedRestaurants.insert(0, osmid);
+
+    // Sauvegarder la liste mise à jour dans SharedPreferences
+    await sharedPreferences.setStringList('viewedRestaurants', viewedRestaurants);
+  }
+
+
+  Future<List<String>> getViewedOsmid() async {
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+
+    // Récupérer la liste des restaurants consultés ou une liste vide si aucune donnée n'est disponible
+    List<String> viewedOsmid = sharedPreferences.getStringList('viewedRestaurants') ?? [];
+
+    return viewedOsmid;
   }
 
 

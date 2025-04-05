@@ -6282,7 +6282,7 @@
 
       }
     },
-    "osm_id": "way/42170973",
+    "osm_id": "42170973",
     "type": "restaurant",
     "name": "C' Dubs",
     "operator": null,
@@ -15655,7 +15655,7 @@
 
       }
     },
-    "osm_id": "way/38223595",
+    "osm_id": "38223595",
     "type": "fast_food",
     "name": "McDonald's",
     "operator": null,
@@ -16838,7 +16838,7 @@
 
       }
     },
-    "osm_id": "way/806899562",
+    "osm_id": "806899562",
     "type": "bar",
     "name": "La Capitainerie",
     "operator": null,

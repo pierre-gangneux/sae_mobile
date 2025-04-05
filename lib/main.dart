@@ -7,8 +7,11 @@ import 'package:sae_mobile/Views/Profil/favorisView.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:sqflite_common_ffi_web/sqflite_ffi_web.dart';
 import 'ViewModels/avisViewModel.dart';
+import 'Model/Connexion/authentification.dart';
+import 'ViewModels/connexionViewModel.dart';
 import 'Views/connectionView.dart';
 import 'ViewModels/LikeViewModel.dart';
+import 'ViewModels/cuisineViewModel.dart';
 import 'Views/home.dart';
 import 'package:sae_mobile/Views/Profil/profilView.dart';
 import 'Views/navigBottom.dart';
@@ -42,7 +45,26 @@ class MyApp extends StatelessWidget {
 
   final GoRouter _router = GoRouter(
     navigatorKey: _rootNavigatorKey,
-    initialLocation: '/register', // Modifier la route initiale vers la page RegisterView
+    initialLocation: '/register', // Route initiale
+    redirect: (BuildContext context, GoRouterState state) {
+      final authState = Provider.of<AuthState>(context, listen: false);
+
+      // Vérifie si l'utilisateur essaye de tricher
+      final isLoggingIn = state.matchedLocation == '/Connexion';
+      final isRegistering = state.matchedLocation == '/register';
+
+      // Si l'utilisateur essaye de tricher
+      if (!authState.isSignedIn) {
+        // A le droit d'aller sur /Connexion ou /register
+        if (isLoggingIn || isRegistering) {
+          return null;
+        }
+        return '/register'; // Renvoie vers /register
+      }
+
+      // Sinon c'est bon
+      return null;
+    },
     routes: <RouteBase>[
       StatefulShellRoute.indexedStack(
         builder: (BuildContext context, GoRouterState state,
@@ -63,8 +85,7 @@ class MyApp extends StatelessWidget {
             routes: <RouteBase>[
               GoRoute(
                 path: '/restaurants',
-                builder: (BuildContext context, GoRouterState state) =>
-                    SearchView(),
+                builder: (BuildContext context, GoRouterState state) => SearchView(),
                 routes: [
                   GoRoute(
                     path: ':id',
@@ -72,12 +93,13 @@ class MyApp extends StatelessWidget {
                     builder: (BuildContext context, GoRouterState state) {
                       final String restaurantId = state.pathParameters['id']!;
                       // Récupérer l'objet Restaurant en fonction de l'ID via Provider
-                      final restaurantViewModel = Provider.of<RestaurantViewModel>(context);
+                      final restaurantViewModel = Provider.of<RestaurantViewModel>(context, listen: false);
                       final restaurant = restaurantViewModel.getRestaurantById(restaurantId);
 
                       if (restaurant == null) {
                         return Scaffold(body: Center(child: Text('Restaurant non trouvé')));
                       }
+                      debugPrint('RestaurantDetailView construit pour l\'ID: $restaurantId');
 
                       // Passer l'objet Restaurant au widget RestaurantDetailView
                       return RestaurantDetailView(restaurant: restaurant);
@@ -91,8 +113,7 @@ class MyApp extends StatelessWidget {
             routes: <RouteBase>[
               GoRoute(
                 path: '/map',
-                builder: (BuildContext context, GoRouterState state) =>
-                    MapView(),
+                builder: (BuildContext context, GoRouterState state) => MapView(),
               ),
             ],
           ),
@@ -123,7 +144,7 @@ class MyApp extends StatelessWidget {
       ),
       // Route pour la page de connexion
       GoRoute(
-        path: '/connexion',
+        path: '/Connexion',
         builder: (BuildContext context, GoRouterState state) => const ConnectionView(),
       ),
     ],
@@ -134,16 +155,25 @@ class MyApp extends StatelessWidget {
     RestaurantViewModel restaurantViewModel = RestaurantViewModel(database!);
     return MultiProvider(
       providers: [
+        ChangeNotifierProvider(create: (context) => AuthState()),
         ChangeNotifierProvider(create: (context) => restaurantViewModel),
         ChangeNotifierProvider(
-          create: (_) {
-            LikeViewModel likeViewModel = LikeViewModel(
-              database!, restaurantViewModel.listeRestaux
-            );
+          create: (context) {
+            LikeViewModel likeViewModel = LikeViewModel(database!, restaurantViewModel.restauRep);
             return likeViewModel;
           }
         ),
         ChangeNotifierProvider(create: (context) => AvisViewModel(database!)),
+        ChangeNotifierProvider(
+            create: (context) {
+              CuisineViewModel cuisineViewModel = CuisineViewModel(database!);
+              return cuisineViewModel;
+            }),
+        ChangeNotifierProvider(
+            create: (context) {
+              ConnexionViewModel connexionViewModel = ConnexionViewModel();
+              return connexionViewModel;
+            })
       ],
       child: Consumer<RestaurantViewModel>(
         builder: (context, restaurantViewModel, child) {

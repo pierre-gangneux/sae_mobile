@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import '../Model/Restaurant.dart'; // Assurez-vous que le chemin est correct.
+import '../Model/Restaurant/Restaurant.dart'; // Assurez-vous que le chemin est correct.
 
 class ViewRestaurant extends StatelessWidget {
   final Axis axis; // Propriété pour définir l'axe de défilement

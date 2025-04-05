@@ -3,7 +3,7 @@ import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sqflite/sqflite.dart';
-import '../Model/inscrireModel.dart';
+import '../Model/Connexion/inscrireModel.dart';
 import 'package:flutter/widgets.dart';
 
 class RegisterView extends StatefulWidget {
@@ -31,7 +31,7 @@ class _RegisterViewState extends State<RegisterView> {
       _registerModel.password = _formKey.currentState?.fields['password']?.value ?? '';
       _registerModel.confirmPassword = _formKey.currentState?.fields['ConfirmPassword']?.value ?? '';
 
-      final String dbPath = await getDatabasePath(); // Obtenir le chemin de la base de données
+      final String dbPath = await getDatabasePath();
 
       bool success = await _registerModel.registerUser(dbPath);
       if (success) {
@@ -39,7 +39,7 @@ class _RegisterViewState extends State<RegisterView> {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Inscription réussie')),
           );
-          context.go('/connexion'); // Rediriger vers la page de connexion
+          context.go('/Connexion');
         }
       } else {
         if (mounted) {
@@ -60,104 +60,114 @@ class _RegisterViewState extends State<RegisterView> {
       body: Padding(
         padding: const EdgeInsets.all(30.0),
         child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              FormBuilder(
-                key: _formKey,
-                child: Column(
-                  children: [
-                    FormBuilderTextField(
-                      name: 'username',
-                      decoration: const InputDecoration(labelText: "Nom d'utilisateur"),
-                      validator: FormBuilderValidators.required(errorText: "Veuillez renseigner un nom d'utilisateur"),
-                    ),
-                    const SizedBox(height: 20),
-                    FormBuilderTextField(
-                      name: 'password',
-                      obscureText: _isPasswordHide,
-                      decoration: InputDecoration(
-                        labelText: 'Mot de passe',
-                        suffixIcon: IconButton(
-                          icon: Icon(_isPasswordHide ? Icons.visibility_off : Icons.visibility),
-                          onPressed: () {
-                            setState(() {
-                              _isPasswordHide = !_isPasswordHide;
-                            });
-                          },
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                FormBuilder(
+                  key: _formKey,
+                  child: Column(
+                    children: [
+                      FormBuilderTextField(
+                        name: 'username',
+                        decoration: const InputDecoration(labelText: "Nom d'utilisateur"),
+                        validator: FormBuilderValidators.required(errorText: "Veuillez renseigner un nom d'utilisateur"),
+                      ),
+                      const SizedBox(height: 20),
+                      FormBuilderTextField(
+                        name: 'password',
+                        obscureText: _isPasswordHide,
+                        decoration: InputDecoration(
+                          labelText: 'Mot de passe',
+                          suffixIcon: IconButton(
+                            icon: Icon(_isPasswordHide ? Icons.visibility_off : Icons.visibility),
+                            onPressed: () {
+                              setState(() {
+                                _isPasswordHide = !_isPasswordHide;
+                              });
+                            },
+                          ),
                         ),
+                        onChanged: (value) {
+                          setState(() {
+                            _passwordStrength = _registerModel.getPasswordStrength(value ?? '');
+                          });
+                        },
+                        validator: (password) {
+                          if (password == null || password.isEmpty) {
+                            return "Le mot de passe ne doit pas être vide";
+                          }
+                          if (_registerModel.getPasswordStrength(password) < 0.3) {
+                            return "Mot de passe trop faible";
+                          }
+                          return null;
+                        },
                       ),
-                      onChanged: (value) {
-                        setState(() {
-                          _passwordStrength = _registerModel.getPasswordStrength(value ?? '');
-                        });
-                      },
-                      validator: (password) {
-                        if (password == null || password.isEmpty) {
-                          return "Le mot de passe ne doit pas être vide";
-                        }
-                        if (_registerModel.getPasswordStrength(password) < 0.3) {
-                          return "Mot de passe trop faible";
-                        }
-                        return null;
-                      },
-                    ),
-                    const SizedBox(height: 10),
-
-                    if (_passwordStrength > 0) ...[
-                      LinearProgressIndicator(
-                        value: _passwordStrength,
-                        backgroundColor: Colors.grey[300],
-                        color: _passwordStrength < 0.3 ? Colors.red : (_passwordStrength < 0.7 ? Colors.orange : Colors.green),
-                        minHeight: 8,
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        _passwordStrength < 0.3 ? "Mot de passe faible"
-                            : (_passwordStrength < 0.7 ? "Mot de passe moyen" : "Mot de passe fort"),
-                        style: TextStyle(
-                          color: _passwordStrength < 0.3 ? Colors.red : (_passwordStrength < 0.7 ? Colors.orange : Colors.green),
-                          fontWeight: FontWeight.bold,
+                      const SizedBox(height: 10),
+                      if (_passwordStrength > 0) ...[
+                        LinearProgressIndicator(
+                          value: _passwordStrength,
+                          backgroundColor: Colors.grey[300],
+                          color: _passwordStrength < 0.3
+                              ? Colors.red
+                              : (_passwordStrength < 0.7 ? Colors.orange : Colors.green),
+                          minHeight: 8,
                         ),
+                        const SizedBox(height: 2),
+                        Text(
+                          _passwordStrength < 0.3
+                              ? "Mot de passe faible"
+                              : (_passwordStrength < 0.7 ? "Mot de passe moyen" : "Mot de passe fort"),
+                          style: TextStyle(
+                            color: _passwordStrength < 0.3
+                                ? Colors.red
+                                : (_passwordStrength < 0.7 ? Colors.orange : Colors.green),
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ] else ...[
+                        const SizedBox(height: 30),
+                      ],
+                      FormBuilderTextField(
+                        name: 'ConfirmPassword',
+                        obscureText: _isConfirmHide,
+                        decoration: InputDecoration(
+                          labelText: 'Confirmation du mot de passe',
+                          suffixIcon: IconButton(
+                            icon: Icon(_isConfirmHide ? Icons.visibility_off : Icons.visibility),
+                            onPressed: () {
+                              setState(() {
+                                _isConfirmHide = !_isConfirmHide;
+                              });
+                            },
+                          ),
+                        ),
+                        validator: (confirm) {
+                          String password = _formKey.currentState?.fields['password']?.value ?? '';
+                          if (confirm == null || confirm.isEmpty) {
+                            return "Le champ ne doit pas être vide";
+                          }
+                          if (password != confirm) {
+                            return "Le mot de passe n'est pas identique";
+                          }
+                          return null;
+                        },
                       ),
-                    ] else ...[
-                      const SizedBox(height: 30),
                     ],
-
-                    FormBuilderTextField(
-                      name: 'ConfirmPassword',
-                      obscureText: _isConfirmHide,
-                      decoration: InputDecoration(
-                        labelText: 'Confirmation du mot de passe',
-                        suffixIcon: IconButton(
-                          icon: Icon(_isConfirmHide ? Icons.visibility_off : Icons.visibility),
-                          onPressed: () {
-                            setState(() {
-                              _isConfirmHide = !_isConfirmHide;
-                            });
-                          },
-                        ),
-                      ),
-                      validator: (confirm) {
-                        String password = _formKey.currentState?.fields['password']?.value ?? '';
-                        if (confirm == null || confirm.isEmpty) {
-                          return "Le champ ne doit pas être vide";
-                        }
-                        if (password != confirm) {
-                          return "Le mot de passe n'est pas identique";
-                        }
-                        return null;
-                      },
-                    ),
-                  ],
+                  ),
                 ),
-              ),
-              const SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: _registerAndNavigate, // Inscrire et rediriger avec un seul bouton
-                child: const Text('S\'enregistrer'),
-              ),
-            ],
+                const SizedBox(height: 20),
+                ElevatedButton(
+                  onPressed: _registerAndNavigate,
+                  child: const Text('S\'enregistrer'),
+                ),
+                const SizedBox(height: 10),// Faire un espace
+                TextButton(
+                  onPressed: () => context.go('/Connexion'),
+                  child: const Text("Déjà un compte ? Se connecter"),
+                ),
+              ],
+            ),
           ),
         ),
       ),

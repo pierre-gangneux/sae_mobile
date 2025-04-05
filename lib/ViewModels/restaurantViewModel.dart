@@ -1,40 +1,75 @@
 import 'package:flutter/cupertino.dart';
-import 'package:provider/provider.dart';
-import 'package:sae_mobile/Model/Restaurant.dart';
-import 'package:sae_mobile/Model/listRestaurants.dart';
+import 'package:sae_mobile/Model/Restaurant/Restaurant.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sqflite/sqflite.dart';
+
+import '../Model/Restaurant/restaurantRepository.dart';
 
 
 class RestaurantViewModel extends ChangeNotifier{
-  late ListRestaurants listeRestaux;
+  late RestaurantRepository restauRep;
+  late Database _db;
+  late List<String> _listOsmid;
 
   RestaurantViewModel(Database db){
-    listeRestaux= new ListRestaurants();
+    restauRep= new RestaurantRepository();
+    _db = db;
+    _listOsmid  = [];
     init(db);
   }
 
 
-  void generateRestaurant(){
-    listeRestaux.generateRestaurant(50);
+  getViewedOsmid() async {
+    _listOsmid = await restauRep.getViewedOsmid();
     notifyListeners();
   }
 
+
   Future<void> init(Database db) async {
-    await listeRestaux.fromDatabase(db);
-    notifyListeners();  // Notifie les écouteurs pour que l'UI se mette à jour
+    await restauRep.fromDatabase(db);
+    await getViewedRestaurants();
   }
 
   Restaurant? getRestaurantById(String restaurantId){
-    return listeRestaux.getRestaurantById(restaurantId);
+    return restauRep.getRestaurantById(restaurantId);
   }
 
   List<Restaurant> getRestaurants(){
-    return listeRestaux.currentRestaurants;
+    return restauRep.currentRestaurants;
   }
 
-  void setRestaurantFiltre(String? nomRestau, String? categorie, List<String>? options){
-    listeRestaux.setRestaurantFiltre(nomRestau, categorie, options);
+
+  Future<void> setRestaurantFiltre(String? nomRestau, String? categorie, List<String>? options, List<String>? cuisinesSelect) async {
+    await restauRep.setRestaurantFiltre(_db, nomRestau, categorie, options, cuisinesSelect, null);
     notifyListeners();
+  }
+
+  void saveRestaurant(String osmid) async {
+    restauRep.saveRestaurant(osmid);
+    notifyListeners();
+  }
+
+
+  Future<List<Restaurant>> getViewedRestaurants() async {
+
+    // Récupérer la liste des osmid des restaurants consultés
+    await getViewedOsmid();
+
+    // Si la liste est vide, retourner une liste vide de Restaurant
+    if (_listOsmid.isEmpty) {
+      return [];
+    }
+
+    // Utiliser les osmid pour récupérer les informations complètes des restaurants
+    List<Restaurant> viewedRestaurants = [];
+    for (String osmid in _listOsmid) {
+      Restaurant? restaurant = await restauRep.getRestaurantById(osmid);
+      if (restaurant != null) {
+        viewedRestaurants.add(restaurant);
+      }
+    }
+
+    return viewedRestaurants;
   }
 
 

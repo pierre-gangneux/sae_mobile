@@ -3,7 +3,8 @@ import 'package:sqflite/sqflite.dart';
 
 import '../Model/Avis/avisRepository.dart';
 import '../Model/Avis/avis.dart';
-import '../Model/Restaurant.dart';
+
+import '../Model/Restaurant/Restaurant.dart';
 import '../Model/User.dart';
 
 class AvisViewModel extends ChangeNotifier{

@@ -1,6 +1,6 @@
 import 'package:sqflite/sqflite.dart';
 
-import '../Restaurant.dart';
+import '../Restaurant/Restaurant.dart';
 import '../User.dart';
 import 'avis.dart';
 

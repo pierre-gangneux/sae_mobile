@@ -2,20 +2,42 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:sae_mobile/Views/Avis/avisSectionView.dart';
 import 'package:url_launcher/url_launcher.dart';
-import '../Model/Like.dart';
-import '../Model/Restaurant.dart';
+import '../Model/Like/Like.dart';
+import '../Model/Restaurant/Restaurant.dart';
 import '../ViewModels/LikeViewModel.dart';
+import '../ViewModels/connexionViewModel.dart';
+import '../ViewModels/restaurantViewModel.dart';
 
-class RestaurantDetailView extends StatelessWidget {
+class RestaurantDetailView extends StatefulWidget {
   final Restaurant restaurant;
+
 
   const RestaurantDetailView({super.key, required this.restaurant});
 
   @override
+  State<RestaurantDetailView> createState() => _RestaurantDetailViewState();
+}
+
+class _RestaurantDetailViewState extends State<RestaurantDetailView> {
+  @override
+  void initState() {
+    super.initState();
+
+    // Utiliser addPostFrameCallback pour exécuter le code après que l'arbre des widgets soit complètement construit
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      // Sauvegarder le restaurant dans le modèle lorsque la page est initialisée
+      final restaurantViewModel = context.read<RestaurantViewModel>();
+      restaurantViewModel.saveRestaurant(widget.restaurant.osmid);
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final username = context.read<ConnexionViewModel>().getUsername()!;
+    final likeViewModel = context.watch<LikeViewModel>();
     return Scaffold(
       appBar: AppBar(
-        title: Text(restaurant.nomRestaurant),
+        title: Text(widget.restaurant.nomRestaurant),
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -31,47 +53,75 @@ class RestaurantDetailView extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        restaurant.nomRestaurant,
+                        widget.restaurant.nomRestaurant,
                         style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
                       ),
-                      /*Row(
-                        children: List.generate(
-                          restaurant.etoiles,
-                              (index) => Icon(Icons.star, color: Colors.amber),
-                        ),
-                      ),*/
-                      ElevatedButton(
-                        onPressed: () {
-                          Like like = new Like(username: "Lucas doit faire", osmid: restaurant.osmid);
-                          context.read<LikeViewModel>().addLike(like);
-                        },
-                        style: ElevatedButton.styleFrom(
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8), // Facultatif pour arrondir
-                          ),
-                          padding: EdgeInsets.all(12), // Ajuste l'espace interne
-                        ),
-                        child: Icon(Icons.favorite),
-                      ),
 
+
+                      // Bouton Like
+                      FutureBuilder<List<Restaurant?>>(
+
+                        future: likeViewModel.getLike(username),
+                        builder: (context, snapshot) {
+                          final likedRestaurants = snapshot.data ?? [];
+                          final isLiked = likedRestaurants.any(
+                                (like) => like!.osmid == widget.restaurant.osmid,
+                          );
+
+                          return ElevatedButton(
+                            onPressed: () {
+                              Like like = Like(username: username, osmid: widget.restaurant.osmid);
+                              if (isLiked) {
+                                likeViewModel.removeLike(like);
+                              } else {
+                                likeViewModel.addLike(like);
+                              }
+                            },
+                            child: Icon(
+                              Icons.favorite,
+                              color: isLiked ? Colors.red : Colors.grey,
+                            ),
+                            style: ElevatedButton.styleFrom(
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              padding: EdgeInsets.all(12),
+                              backgroundColor: isLiked ? Colors.red[100] : Colors.grey[200],
+                            ),
+                          );
+                        },
+                      )
 
                     ],
                   ),
+
                   SizedBox(height: 8),
 
                   // Téléphone et site internet
-                  if (restaurant.telephone != null)
-                    _buildInfoRow(Icons.phone, restaurant.telephone!, onTap: () {
-                      launchUrl(Uri.parse("tel:${restaurant.telephone}"));
-                    }),
-                  if (restaurant.siteInternet != null)
-                    _buildInfoRow(Icons.language, "Site web", onTap: () {
-                      launchUrl(Uri.parse(restaurant.siteInternet!));
-                    }),
-                  if (restaurant.facebook != null)
-                    _buildInfoRow(Icons.facebook, "Facebook", onTap: () {
-                      launchUrl(Uri.parse(restaurant.facebook!));
-                    }),
+                  if (widget.restaurant.telephone != null)
+                    _buildInfoRow(
+                      Icons.phone,
+                      widget.restaurant.telephone!,
+                      onTap: () {
+                        launchUrl(Uri.parse("tel:${widget.restaurant.telephone}"));
+                      },
+                    ),
+                  if (widget.restaurant.siteInternet != null)
+                    _buildInfoRow(
+                      Icons.language,
+                      "Site web",
+                      onTap: () {
+                        launchUrl(Uri.parse(widget.restaurant.siteInternet!));
+                      },
+                    ),
+                  if (widget.restaurant.facebook != null)
+                    _buildInfoRow(
+                      Icons.facebook,
+                      "Facebook",
+                      onTap: () {
+                        launchUrl(Uri.parse(widget.restaurant.facebook!));
+                      },
+                    ),
 
                   SizedBox(height: 16),
 
@@ -85,32 +135,34 @@ class RestaurantDetailView extends StatelessWidget {
                   Wrap(
                     spacing: 10,
                     children: [
-                      if (restaurant.vegetarien == "yes") _buildChip("Végétarien"),
-                      if (restaurant.vegan == "yes") _buildChip("Vegan"),
-                      if (restaurant.livraison == "yes") _buildChip("Livraison"),
-                      if (restaurant.aEmporter == "yes") _buildChip("À Emporter"),
-                      if (restaurant.drive == "yes") _buildChip("Drive"),
-                      if (restaurant.accessInternet == "yes") _buildChip("Wi-Fi Gratuit"),
-                      if (restaurant.espaceFumeur == "yes") _buildChip("Espace Fumeur"),
-                      if (restaurant.fauteuilRoulant == "yes") _buildChip("Accès PMR"),
+                      if (widget.restaurant.vegetarien == "yes") _buildChip("Végétarien"),
+                      if (widget.restaurant.vegan == "yes") _buildChip("Vegan"),
+                      if (widget.restaurant.livraison == "yes") _buildChip("Livraison"),
+                      if (widget.restaurant.aEmporter == "yes") _buildChip("À Emporter"),
+                      if (widget.restaurant.drive == "yes") _buildChip("Drive"),
+                      if (widget.restaurant.accessInternet == "yes") _buildChip("Wi-Fi Gratuit"),
+                      if (widget.restaurant.espaceFumeur == "yes") _buildChip("Espace Fumeur"),
+                      if (widget.restaurant.fauteuilRoulant == "yes") _buildChip("Accès PMR"),
                     ],
                   ),
+
                   SizedBox(height: 16),
 
                   // Localisation
-                  if (restaurant.latitude != null && restaurant.longitude != null)
+                  if (widget.restaurant.latitude != null && widget.restaurant.longitude != null)
                     ElevatedButton.icon(
                       onPressed: () {
                         launchUrl(Uri.parse(
-                            "https://www.google.com/maps/search/?api=1&query=${restaurant.latitude},${restaurant.longitude}"));
+                            "https://www.google.com/maps/search/?api=1&query=${widget.restaurant.latitude},${widget.restaurant.longitude}"));
                       },
                       icon: Icon(Icons.map),
                       label: Text("Voir sur Google Maps"),
                     ),
                   SizedBox(height: 32),
-                  AvisSectionView(restaurant: restaurant),
+                  AvisSectionView(restaurant: widget.restaurant),
                 ],
               ),
+
             ),
           ],
         ),

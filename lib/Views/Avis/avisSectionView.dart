@@ -3,7 +3,7 @@ import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:provider/provider.dart';
 
 import '../../Model/Avis/avis.dart';
-import '../../Model/Restaurant.dart';
+import '../../Model/Restaurant/Restaurant.dart';
 import '../../ViewModels/avisViewModel.dart';
 import 'AvisCard.dart';
 
