@@ -51,42 +51,24 @@ class RestaurantRepository{
     return restaurants;
   }
 
-  // Méthode pour générer des restaurants d'exemple
-  List<Restaurant> generateRestaurant(int i) {
-    List<Restaurant> restaurants = [];
-    for (int n = 0; n < i; n++) {
-      restaurants.add(
-        Restaurant(
-          osmid: n.toString(),
-          nomRestaurant: "Restaurant Exemple",
-          type: "Restaurant",
-          etoiles: 5,
-          telephone: "0102030405",
-          siteInternet: "https://www.restaurantexemple.com",
-          facebook: "https://www.facebook.com/restaurantexemple",
-          vegetarien: "yes",
-          vegan: "no",
-          livraison: "yes",
-          latitude: "48.8566",
-          longitude: "2.3522",
-        ),
-      );
-    }
-    _lesRestaurants = restaurants;
-    _currentRestaurants = restaurants;
-
-    return restaurants;
-  }
 
 
   Restaurant? getRestaurantById(String id) {
-    return lesRestaurants.firstWhere((restaurant) => restaurant.osmid == id, orElse: null);
+    for (var restaurant in lesRestaurants) {
+      if (restaurant.osmid == id) {
+        return restaurant;
+      }
+    }
+    return null;
   }
 
 
 
-  Future<void> setRestaurantFiltre(Database db, String? nomRestau, String? categorie, List<String>?options, List<String>? selectCuisines) async {
-    CuisineRepository CR =  new CuisineRepository(db);
+
+
+  Future<void> setRestaurantFiltre(Database db, String? nomRestau, String? categorie, List<String>?options, List<String>? selectCuisines, CuisineRepository? injectedCR) async { // Paramètre optionnel pour l'injection test
+    // Si injectedCR est null, on crée une nouvelle instance de CuisineRepository
+    CuisineRepository CR = injectedCR ?? CuisineRepository(db);
     List<Restaurant> res = [];
     for (Restaurant restau in _lesRestaurants) {
       await CR.loadCuisinesRestaurant(restau);
@@ -118,7 +100,6 @@ class RestaurantRepository{
   }
 
   bool optionPresent(Restaurant restau, List<String> options) {
-    print(restau.fauteuilRoulant);
     if (options.contains("vegetarien") && (restau.vegetarien != "yes")) return false;
     if (options.contains("vegan") && (restau.vegan != "yes")) return false;
     if (options.contains("espaceFumeur") && (restau.espaceFumeur != "yes")) return false;

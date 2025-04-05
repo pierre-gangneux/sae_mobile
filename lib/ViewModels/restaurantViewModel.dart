@@ -24,10 +24,6 @@ class RestaurantViewModel extends ChangeNotifier{
     notifyListeners();
   }
 
-  void generateRestaurant(){
-    restauRep.generateRestaurant(50);
-    notifyListeners();
-  }
 
   Future<void> init(Database db) async {
     await restauRep.fromDatabase(db);
@@ -44,7 +40,7 @@ class RestaurantViewModel extends ChangeNotifier{
 
 
   Future<void> setRestaurantFiltre(String? nomRestau, String? categorie, List<String>? options, List<String>? cuisinesSelect) async {
-    await restauRep.setRestaurantFiltre(_db, nomRestau, categorie, options, cuisinesSelect);
+    await restauRep.setRestaurantFiltre(_db, nomRestau, categorie, options, cuisinesSelect, null);
     notifyListeners();
   }
 
@@ -75,9 +71,6 @@ class RestaurantViewModel extends ChangeNotifier{
 
     return viewedRestaurants;
   }
-
-
-
 
 
 
