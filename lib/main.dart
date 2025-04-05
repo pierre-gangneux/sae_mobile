@@ -6,7 +6,7 @@ import 'package:sae_mobile/Views/Profil/commentsView.dart';
 import 'package:sae_mobile/Views/Profil/favorisView.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:sqflite_common_ffi_web/sqflite_ffi_web.dart';
-import 'Model/authentification.dart';
+import 'Model/Connexion/authentification.dart';
 import 'ViewModels/connexionViewModel.dart';
 import 'Views/connectionView.dart';
 import 'ViewModels/LikeViewModel.dart';
@@ -49,12 +49,12 @@ class MyApp extends StatelessWidget {
       final authState = Provider.of<AuthState>(context, listen: false);
 
       // Vérifie si l'utilisateur essaye de tricher
-      final isLoggingIn = state.matchedLocation == '/connexion';
+      final isLoggingIn = state.matchedLocation == '/Connexion';
       final isRegistering = state.matchedLocation == '/register';
 
       // Si l'utilisateur essaye de tricher
       if (!authState.isSignedIn) {
-        // A le droit d'aller sur /connexion ou /register
+        // A le droit d'aller sur /Connexion ou /register
         if (isLoggingIn || isRegistering) {
           return null;
         }
@@ -142,7 +142,7 @@ class MyApp extends StatelessWidget {
       ),
       // Route pour la page de connexion
       GoRoute(
-        path: '/connexion',
+        path: '/Connexion',
         builder: (BuildContext context, GoRouterState state) => const ConnectionView(),
       ),
     ],

@@ -1,12 +1,9 @@
-
-
 import 'package:flutter/cupertino.dart';
-import 'package:sae_mobile/Model/listRestaurants.dart';
 import 'package:sqflite/sqflite.dart';
-
-import '../Model/Like.dart';
-import '../Model/LikeRepository.dart';
-import '../Model/Restaurant.dart';
+import '../Model/Like/Like.dart';
+import '../Model/Like/LikeRepository.dart';
+import '../Model/Restaurant/Restaurant.dart';
+import '../Model/Restaurant/listRestaurants.dart';
 import '../Model/User.dart';
 
 class LikeViewModel extends ChangeNotifier{

@@ -40,14 +40,14 @@ class LoginModel {
       );
 
       if (users.isNotEmpty) {
-        // Utilisateur trouvé, mettre à jour l'état de connexion
+        // Utilisateur trouvé, mettre à jour l'état de Connexion
         Provider.of<AuthState>(context, listen: false).signIn();
         return true;
       } else {
         return false;
       }
     } catch (e) {
-      print("Erreur lors de la connexion : $e");
+      print("Erreur lors de la Connexion : $e");
       return false;
     }
   }

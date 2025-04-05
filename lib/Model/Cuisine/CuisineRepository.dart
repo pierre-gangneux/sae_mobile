@@ -1,4 +1,4 @@
-import 'package:sae_mobile/Model/Restaurant.dart';
+import 'package:sae_mobile/Model/Restaurant/Restaurant.dart';
 import 'package:sqflite/sqflite.dart';
 
 class CuisineRepository {

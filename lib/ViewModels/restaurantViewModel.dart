@@ -1,8 +1,8 @@
 import 'package:flutter/cupertino.dart';
-import 'package:provider/provider.dart';
-import 'package:sae_mobile/Model/Restaurant.dart';
-import 'package:sae_mobile/Model/listRestaurants.dart';
+import 'package:sae_mobile/Model/Restaurant/Restaurant.dart';
 import 'package:sqflite/sqflite.dart';
+
+import '../Model/Restaurant/listRestaurants.dart';
 
 
 class RestaurantViewModel extends ChangeNotifier{

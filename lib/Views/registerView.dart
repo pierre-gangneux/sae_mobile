@@ -3,7 +3,7 @@ import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sqflite/sqflite.dart';
-import '../Model/inscrireModel.dart';
+import '../Model/Connexion/inscrireModel.dart';
 import 'package:flutter/widgets.dart';
 
 class RegisterView extends StatefulWidget {
@@ -39,7 +39,7 @@ class _RegisterViewState extends State<RegisterView> {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Inscription réussie')),
           );
-          context.go('/connexion');
+          context.go('/Connexion');
         }
       } else {
         if (mounted) {
@@ -163,7 +163,7 @@ class _RegisterViewState extends State<RegisterView> {
                 ),
                 const SizedBox(height: 10),// Faire un espace
                 TextButton(
-                  onPressed: () => context.go('/connexion'),
+                  onPressed: () => context.go('/Connexion'),
                   child: const Text("Déjà un compte ? Se connecter"),
                 ),
               ],

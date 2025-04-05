@@ -1,8 +1,8 @@
-import 'package:sae_mobile/Model/Cuisine.dart';
+import 'package:sae_mobile/Model/Cuisine/Cuisine.dart';
 import 'package:sqflite/sqflite.dart';
 
-import '../ViewModels/cuisineViewModel.dart';
-import 'CuisineRepository.dart';
+import '../../ViewModels/cuisineViewModel.dart';
+import '../Cuisine/CuisineRepository.dart';
 import 'Restaurant.dart';
 
 class ListRestaurants{

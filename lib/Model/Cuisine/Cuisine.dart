@@ -1,6 +1,6 @@
 import 'package:sqflite/sqflite.dart';
 
-import 'Restaurant.dart';
+import '../Restaurant/Restaurant.dart';
 
 class Cuisine {
   String nomCuisine;

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
-import '../Model/Like.dart';
-import '../Model/Restaurant.dart';
+import '../Model/Like/Like.dart';
+import '../Model/Restaurant/Restaurant.dart';
 import '../ViewModels/LikeViewModel.dart';
 import '../ViewModels/connexionViewModel.dart';
 
