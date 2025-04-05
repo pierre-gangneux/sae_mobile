@@ -30,7 +30,7 @@ class LikeViewModel extends ChangeNotifier{
     notifyListeners();
   }
 
-  Future<List<Restaurant?>> getLike(String username) {
+  Future<List<Restaurant>> getLike(String username) {
     return _likeRepository.getLike(_db, username);
   }
 
