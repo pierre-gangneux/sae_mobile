@@ -3,7 +3,7 @@ import 'package:crypto/crypto.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'authentification.dart'; // Assurez-vous d'importer AuthState
+import 'authentification.dart';
 
 class LoginModel {
   String username;
@@ -14,25 +14,21 @@ class LoginModel {
     required this.password,
   });
 
-  // Hashage
+  // Hashage du mot de passe avec SHA-256
   String hashPassword(String password) {
     return sha256.convert(utf8.encode(password)).toString();
   }
 
-  // Vérifie les informations d'identification dans la base de données
+  // Vérifie si l'user existe
   Future<bool> loginUser(BuildContext context, String dbPath) async {
     final Database db = await openDatabase(
       dbPath,
       version: 1,
-      onCreate: (Database db, int version) async {
-        // Tout est déja initialisée
-      },
     );
 
     String hashedPassword = hashPassword(password);
 
     try {
-      // Recherche de l'utilisateur dans la base de données
       final List<Map<String, dynamic>> users = await db.query(
         'UTILISATEUR',
         where: 'username = ? AND mdp = ?',
@@ -40,8 +36,8 @@ class LoginModel {
       );
 
       if (users.isNotEmpty) {
-        // Utilisateur trouvé, mettre à jour l'état de connexion
-        Provider.of<AuthState>(context, listen: false).signIn();
+        // Si l'user existe on le mets dans la session
+        await context.read<AuthState>().login(username);
         return true;
       } else {
         return false;

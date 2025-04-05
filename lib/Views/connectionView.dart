@@ -4,6 +4,7 @@ import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sqflite/sqflite.dart';
 import '../Model/connexionModel.dart';
+import '../services/session.dart';
 
 class ConnectionView extends StatefulWidget {
   const ConnectionView({super.key});
@@ -87,6 +88,7 @@ class _ConnectionViewState extends State<ConnectionView> {
                     });
 
                     if (isConnected) {
+                      await SessionManager.saveUser(username); // Pour sauvegarder l'user
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(content: Text('Connexion réussie pour $username')),
                       );
@@ -105,7 +107,7 @@ class _ConnectionViewState extends State<ConnectionView> {
               const SizedBox(height: 10),
               TextButton(
                 onPressed: () {
-                  context.go('/profile/register');
+                  context.go('/register');
                 },
                 child: const Text("S'inscrire"),
               ),
