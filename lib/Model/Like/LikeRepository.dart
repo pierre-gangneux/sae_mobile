@@ -1,6 +1,6 @@
 import 'package:sqflite/sqflite.dart';
 
-import '../Restaurant/listRestaurants.dart';
+import '../Restaurant/restaurantRepository.dart';
 import 'Like.dart';
 import '../Restaurant/Restaurant.dart';
 
@@ -9,7 +9,7 @@ import '../Restaurant/Restaurant.dart';
 
 class LikeRepository{
   final Database db;
-  final ListRestaurants lesRestaurant;
+  final RestaurantRepository lesRestaurant;
 
   const LikeRepository(this.db, this.lesRestaurant);
 

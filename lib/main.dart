@@ -158,7 +158,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(
             create: (_) {
               LikeViewModel likeViewModel = LikeViewModel(
-                  database!, restaurantViewModel.listeRestaux);
+                  database!, restaurantViewModel.restauRep);
               return likeViewModel;
             }),
         ChangeNotifierProvider(

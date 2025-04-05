@@ -3,15 +3,15 @@ import 'package:sqflite/sqflite.dart';
 import '../Model/Like/Like.dart';
 import '../Model/Like/LikeRepository.dart';
 import '../Model/Restaurant/Restaurant.dart';
-import '../Model/Restaurant/listRestaurants.dart';
+import '../Model/Restaurant/restaurantRepository.dart';
 import '../Model/User.dart';
 
 class LikeViewModel extends ChangeNotifier{
   late LikeRepository _likeRepository;
-  late ListRestaurants _lesRestaurant;
+  late RestaurantRepository _lesRestaurant;
   late Database _db;
 
-  LikeViewModel(Database db, ListRestaurants lesRestaurant){
+  LikeViewModel(Database db, RestaurantRepository lesRestaurant){
     _lesRestaurant = lesRestaurant;
     _db = db;
     _likeRepository = LikeRepository(db, _lesRestaurant);

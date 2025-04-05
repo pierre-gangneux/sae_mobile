@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:sae_mobile/Views/viewRestaurant.dart';
 
+import '../Model/Restaurant/Restaurant.dart';
 import '../ViewModels/restaurantViewModel.dart';
 
 class Home extends StatelessWidget {
@@ -29,7 +30,15 @@ class Home extends StatelessWidget {
                   style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                   textAlign: TextAlign.left
               ),
-              Expanded(child: ViewRestaurant(axis: Axis.horizontal, restaurants: context.watch<RestaurantViewModel>().getRestaurants())),
+              FutureBuilder<List<Restaurant>>(
+                future: context.watch<RestaurantViewModel>().getViewedRestaurants(), // Appel asynchrone pour récupérer les restaurants
+                builder: (context, snapshot) {
+                  if (snapshot.data?.isEmpty ?? true) {
+                    return Expanded(child: Center(child: Text('Aucun restaurant consulté')));
+                  }
+                  return Expanded(child: ViewRestaurant(axis: Axis.horizontal, restaurants: snapshot.data! ));
+                }
+              ),
             ],
           ),
       ),

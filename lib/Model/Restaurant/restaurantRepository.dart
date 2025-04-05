@@ -4,13 +4,14 @@ import 'package:sqflite/sqflite.dart';
 import '../../ViewModels/cuisineViewModel.dart';
 import '../Cuisine/CuisineRepository.dart';
 import 'Restaurant.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-class ListRestaurants{
+class RestaurantRepository{
 
   List<Restaurant> _currentRestaurants;
   List<Restaurant> _lesRestaurants;
 
-  ListRestaurants() : _lesRestaurants = [], _currentRestaurants = [];
+  RestaurantRepository() : _lesRestaurants = [], _currentRestaurants = [];
 
   List<Restaurant> get lesRestaurants => _lesRestaurants;
   List<Restaurant> get currentRestaurants => _currentRestaurants;
@@ -144,6 +145,33 @@ class ListRestaurants{
   }
 
 
+
+  void saveRestaurant(String osmid) async {
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+
+    List<String> viewedRestaurants = await this.getViewedOsmid();
+
+    // Si le restaurant existe déjà, on le supprime de la liste avant de le remettre au début
+    if (viewedRestaurants.contains(osmid)) {
+      viewedRestaurants.remove(osmid);  // Supprime l'élément existant
+    }
+
+    // Ajouter le restaurant (osmid) au début de la liste
+    viewedRestaurants.insert(0, osmid);
+
+    // Sauvegarder la liste mise à jour dans SharedPreferences
+    await sharedPreferences.setStringList('viewedRestaurants', viewedRestaurants);
+  }
+
+
+  Future<List<String>> getViewedOsmid() async {
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+
+    // Récupérer la liste des restaurants consultés ou une liste vide si aucune donnée n'est disponible
+    List<String> viewedOsmid = sharedPreferences.getStringList('viewedRestaurants') ?? [];
+
+    return viewedOsmid;
+  }
 
 
 }
