@@ -52,6 +52,7 @@ dependencies:
   build_runner: ^2.4.15
   build: ^2.4.2
   mockito: ^5.4.5
+  coverage: ^1.11.1
 
 dev_dependencies:
   flutter_test:
