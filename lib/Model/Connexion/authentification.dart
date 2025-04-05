@@ -20,13 +20,15 @@ class AuthState with ChangeNotifier {
     notifyListeners();
   }
 
-  // Méthode pour se connecter
+
   Future<void> signIn(String username) async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool('isSignedIn', true);  // Enregistre l'état de la connexion
+    await prefs.setBool('isLoggedIn', true);  // Enregistre l'état de la connexion
     _isSignedIn = true;
     notifyListeners();
+    await _saveUserSession();
   }
+
 
   // Méthode pour se déconnecter
   Future<void> signOut() async {

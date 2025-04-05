@@ -42,7 +42,7 @@ class LoginModel {
 
       if (users.isNotEmpty) {
         // Utilisateur trouvé, mettre à jour l'état de Connexion via Provider
-        Provider.of<AuthState>(context, listen: false).signIn(username!);  // Passe uniquement le username
+        await Provider.of<AuthState>(context, listen: false).signIn(username!);  // Passe uniquement le username
         return true;
       } else {
         return false; // Utilisateur non trouvé

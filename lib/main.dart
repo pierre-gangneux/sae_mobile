@@ -21,26 +21,22 @@ import 'Views/mapView.dart';
 import 'database.dart';
 import 'ViewModels/restaurantViewModel.dart';
 
-final GlobalKey<NavigatorState> _rootNavigatorKey =
-GlobalKey<NavigatorState>(debugLabel: 'root');
-final GlobalKey<NavigatorState> _sectionANavigatorKey =
-GlobalKey<NavigatorState>(debugLabel: 'sectionANav');
+final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'root');
+final GlobalKey<NavigatorState> _sectionANavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'sectionANav');
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Initialisation de databaseFactory pour le Web
+  // Web-only: initialisation de databaseFactory
   if (kIsWeb) {
-    databaseFactory = databaseFactoryFfiWeb; // Initialisation de databaseFactory pour le Web
+    databaseFactory = databaseFactoryFfiWeb;
   }
 
-  // Initialisation de SharedPreferences et vérification de l'état de connexion
+  // AuthState et base de données
   final authState = AuthState();
-  await authState.checkLoginStatus(); // Assurez-vous que l'authState est initialisé avant de l'utiliser.
-
   final database = await populateDatabase();
 
-  runApp(MyApp(database: database, authState: authState)); // Passe authState comme paramètre au lieu de l'initialiser ici
+  runApp(MyApp(database: database, authState: authState));
 }
 
 class MyApp extends StatelessWidget {
@@ -52,10 +48,9 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-      future: authState.checkLoginStatus(), // Attendre la vérification du statut de connexion
+      future: authState.checkLoginStatus(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          // Afficher un indicateur de chargement pendant l'initialisation
           return MaterialApp(
             home: Scaffold(
               body: Center(child: CircularProgressIndicator()),
@@ -65,39 +60,29 @@ class MyApp extends StatelessWidget {
 
         final GoRouter _router = GoRouter(
           navigatorKey: _rootNavigatorKey,
-          initialLocation: authState.isSignedIn ? '/home' : '/register', // Redirige selon l'état de connexion
+          initialLocation: authState.isSignedIn ? '/home' : '/register',
           redirect: (BuildContext context, GoRouterState state) {
             final authState = Provider.of<AuthState>(context, listen: false);
-
-            // Vérifie si l'utilisateur essaye de tricher
             final isLoggingIn = state.matchedLocation == '/connexion';
             final isRegistering = state.matchedLocation == '/register';
 
-            // Si l'utilisateur n'est pas connecté, on autorise la connexion ou l'inscription
             if (!authState.isSignedIn) {
-              // Autorise l'accès aux pages de connexion et d'inscription
-              if (isLoggingIn || isRegistering) {
-                return null;
-              }
-              return '/register'; // Renvoie vers /register si non connecté
+              if (isLoggingIn || isRegistering) return null;
+              return '/register';
             }
 
-            // Sinon, c'est bon, on laisse l'utilisateur continuer
             return null;
           },
           routes: <RouteBase>[
             StatefulShellRoute.indexedStack(
-              builder: (BuildContext context, GoRouterState state,
-                  StatefulNavigationShell navigationShell) {
-                return NavigBottom(navigationShell: navigationShell);
-              },
+              builder: (context, state, navigationShell) => NavigBottom(navigationShell: navigationShell),
               branches: <StatefulShellBranch>[
                 StatefulShellBranch(
                   navigatorKey: _sectionANavigatorKey,
                   routes: <RouteBase>[
                     GoRoute(
                       path: '/home',
-                      builder: (BuildContext context, GoRouterState state) => Home(),
+                      builder: (context, state) => Home(),
                     ),
                   ],
                 ),
@@ -105,25 +90,19 @@ class MyApp extends StatelessWidget {
                   routes: <RouteBase>[
                     GoRoute(
                       path: '/restaurants',
-                      builder: (BuildContext context, GoRouterState state) =>
-                          SearchView(),
+                      builder: (context, state) => SearchView(),
                       routes: [
                         GoRoute(
                           path: ':id',
-                          builder: (BuildContext context, GoRouterState state) {
-                            final String restaurantId = state.pathParameters['id']!;
-                            // Récupérer l'objet Restaurant en fonction de l'ID via Provider
-                            final restaurantViewModel =
-                            Provider.of<RestaurantViewModel>(context);
-                            final restaurant =
-                            restaurantViewModel.getRestaurantById(restaurantId);
+                          builder: (context, state) {
+                            final restaurantId = state.pathParameters['id']!;
+                            final restaurantVM = Provider.of<RestaurantViewModel>(context);
+                            final restaurant = restaurantVM.getRestaurantById(restaurantId);
 
                             if (restaurant == null) {
-                              return Scaffold(
-                                  body: Center(child: Text('Restaurant non trouvé')));
+                              return Scaffold(body: Center(child: Text('Restaurant non trouvé')));
                             }
 
-                            // Passer l'objet Restaurant au widget RestaurantDetailView
                             return RestaurantDetailView(restaurant: restaurant);
                           },
                         ),
@@ -135,7 +114,7 @@ class MyApp extends StatelessWidget {
                   routes: <RouteBase>[
                     GoRoute(
                       path: '/map',
-                      builder: (BuildContext context, GoRouterState state) => MapView(),
+                      builder: (context, state) => MapView(),
                     ),
                   ],
                 ),
@@ -143,18 +122,15 @@ class MyApp extends StatelessWidget {
                   routes: <RouteBase>[
                     GoRoute(
                       path: '/profile',
-                      builder: (BuildContext context, GoRouterState state) =>
-                          ProfilView(),
-                      routes: <RouteBase>[
+                      builder: (context, state) => ProfilView(),
+                      routes: [
                         GoRoute(
-                          path: "favoris",
-                          builder: (BuildContext context, GoRouterState state) =>
-                              FavorisView(),
+                          path: 'favoris',
+                          builder: (context, state) => FavorisView(),
                         ),
                         GoRoute(
-                          path: "comments",
-                          builder: (BuildContext context, GoRouterState state) =>
-                              CommentsView(),
+                          path: 'comments',
+                          builder: (context, state) => CommentsView(),
                         ),
                       ],
                     ),
@@ -162,30 +138,22 @@ class MyApp extends StatelessWidget {
                 ),
               ],
             ),
-            // Route pour la page d'inscription
             GoRoute(
               path: '/register',
-              builder: (BuildContext context, GoRouterState state) =>
-              const RegisterView(),
+              builder: (context, state) => const RegisterView(),
             ),
-            // Route pour la page de connexion
             GoRoute(
               path: '/connexion',
-              builder: (BuildContext context, GoRouterState state) =>
-              const ConnectionView(),
+              builder: (context, state) => const ConnectionView(),
             ),
           ],
-          // Tentative de garder les URLs correctes
           errorPageBuilder: (context, state) {
-            // Redirection vers la page d'accueil avec l'URL correcte
             WidgetsBinding.instance.addPostFrameCallback((_) {
               context.go('/home');
             });
-
-            // Retourner une page avec la structure de base et la barre de navigation
             return MaterialPage(
               child: Scaffold(
-                body: Home(), // Affiche la page d'accueil
+                body: Home(),
               ),
             );
           },
@@ -193,48 +161,41 @@ class MyApp extends StatelessWidget {
 
         return MultiProvider(
           providers: [
-            ChangeNotifierProvider(create: (context) => authState), // Utilisation de l'authState passé
-            ChangeNotifierProvider(create: (context) => RestaurantViewModel(database!)),
-            ChangeNotifierProvider(create: (_) {
-              LikeViewModel likeViewModel =
-              LikeViewModel(database!, Provider.of<RestaurantViewModel>(context).restauRep);
-              return likeViewModel;
-            }),
-            ChangeNotifierProvider(create: (_) {
-              CuisineViewModel cuisineViewModel = CuisineViewModel(database!);
-              return cuisineViewModel;
-            }),
-            ChangeNotifierProvider(create: (_) {
-              ConnexionViewModel connexionViewModel = ConnexionViewModel();
-              return connexionViewModel;
-            }),
+            ChangeNotifierProvider(create: (_) => authState),
+            ChangeNotifierProvider(create: (_) => RestaurantViewModel(database!)),
+
+            ChangeNotifierProxyProvider<RestaurantViewModel, LikeViewModel>(
+              create: (context) => LikeViewModel(database!, context.read<RestaurantViewModel>().restauRep),
+              update: (context, restauViewModel, previousLikeVM) =>
+                  LikeViewModel(database!, restauViewModel.restauRep),
+            ),
+
+            ChangeNotifierProvider(create: (_) => CuisineViewModel(database!)),
+            ChangeNotifierProvider(create: (_) => ConnexionViewModel()),
           ],
-          child: Consumer<RestaurantViewModel>(builder: (context, restaurantViewModel, child) {
-            return MaterialApp.router(
-              title: 'SAE Mobile',
-              theme: ThemeData(
-                primarySwatch: Colors.blue,
-                bottomNavigationBarTheme: const BottomNavigationBarThemeData(
-                  backgroundColor: Colors.white,
-                  selectedItemColor: Colors.blue,
-                  unselectedItemColor: Colors.grey,
-                  elevation: 5,
-                ),
-                cardTheme: CardTheme(
-                  color: Colors.grey[600],
-                ),
-                appBarTheme: const AppBarTheme(
-                  backgroundColor: Colors.blue,
-                  elevation: 0,
-                  titleTextStyle: TextStyle(
-                    color: Colors.white,
-                    fontSize: 20,
+          child: Consumer<RestaurantViewModel>(
+            builder: (context, restaurantViewModel, child) {
+              return MaterialApp.router(
+                title: 'SAE Mobile',
+                theme: ThemeData(
+                  primarySwatch: Colors.blue,
+                  bottomNavigationBarTheme: const BottomNavigationBarThemeData(
+                    backgroundColor: Colors.white,
+                    selectedItemColor: Colors.blue,
+                    unselectedItemColor: Colors.grey,
+                    elevation: 5,
+                  ),
+                  cardTheme: CardTheme(color: Colors.grey[600]),
+                  appBarTheme: const AppBarTheme(
+                    backgroundColor: Colors.blue,
+                    elevation: 0,
+                    titleTextStyle: TextStyle(color: Colors.white, fontSize: 20),
                   ),
                 ),
-              ),
-              routerConfig: _router,
-            );
-          }),
+                routerConfig: _router,
+              );
+            },
+          ),
         );
       },
     );
