@@ -1,6 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
+import '../Avis/avisSectionView.dart';
+
 class CommentsView extends StatefulWidget {
   const CommentsView({super.key});
 
@@ -19,7 +21,7 @@ class _CommentsViewState extends State<CommentsView> {
               child: Text("Vos commentaires")
           ),
         ),
-        body: Center(child: Text("Commentaires"))
+        body: AvisSectionView()
     );
   }
 }

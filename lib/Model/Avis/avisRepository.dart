@@ -1,10 +1,8 @@
 import 'package:sqflite/sqflite.dart';
 
-import '../Like.dart';
 import '../Restaurant.dart';
 import '../User.dart';
 import 'avis.dart';
-import '../listRestaurants.dart';
 
 
 class AvisRepository{
@@ -25,14 +23,14 @@ class AvisRepository{
     return avis;
   }
 
-  Future<List<Avis?>> getAvisRestaurants(Restaurant restaurant) async {
+  Future<List<Avis>> getAvisRestaurants(Restaurant restaurant) async {
     // Exécuter la requête pour récupérer les données de la table AVIS pour les restaurants
     List<Map<String, dynamic>> result = await this.db.rawQuery(
         'SELECT username, note, commentaire FROM AVIS WHERE osmid=${restaurant.osmid};'
     );
 
     // Convertir les résultats en instances de Restaurant
-    List<Avis?> avis = result.map((row) {
+    List<Avis> avis = result.map((row) {
       return Avis(row['username'], restaurant.osmid, row['note'], row['commentaire']);
     }).toList();
     return avis;
@@ -49,15 +47,17 @@ class AvisRepository{
   Future<void> removeAvis(Avis avis) async {
     await db.delete(
       'AVIS',
-      where: 'username = ${avis.username} and osmid = ${avis.osmid}'
+      where: 'username = ? and osmid = ?',
+      whereArgs: [avis.username, avis.osmid]
     );
   }
 
   Future<void> editAvis(Avis avis) async {
     await db.update(
-        'AVI',
-        avis.toMap(),
-        where: 'username = ${avis.username} and osmid = ${avis.osmid}'
+      'AVIS',
+      avis.toMap(),
+      where: 'username = ? and osmid = ?',
+      whereArgs: [avis.username, avis.osmid],
     );
   }
 }
