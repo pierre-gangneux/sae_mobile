@@ -45,6 +45,7 @@ class RestaurantRepository{
     }).toList();
     _lesRestaurants = restaurants;
     _currentRestaurants = restaurants;
+    print('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa');
 
     return restaurants;
   }
@@ -66,21 +67,27 @@ class RestaurantRepository{
 
   Future<void> setRestaurantFiltre(Database db, String? nomRestau, String? categorie, List<String>?options, List<String>? selectCuisines, CuisineRepository? injectedCR) async { // Paramètre optionnel pour l'injection test
     // Si injectedCR est null, on crée une nouvelle instance de CuisineRepository
+    print('bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb');
     CuisineRepository CR = injectedCR ?? CuisineRepository(db);
+    print('bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb');
     List<Restaurant> res = [];
+    Set<String> cuisinesRestaux = Set();
+    if (selectCuisines != null){
+      cuisinesRestaux = await CR.getOsmidRestaurants(selectCuisines);
+    }
+
     for (Restaurant restau in _lesRestaurants) {
-      await CR.loadCuisinesRestaurant(restau);
-      List<String> cuisinesRestau = CR.getCuisinesRestaurant();
       if (
       (nomRestau == null || restau.nomRestaurant.toLowerCase().contains(nomRestau.toLowerCase()) )
       && (categorie == null || sameCategorie(categorie, restau.type))
       && (options == null || optionPresent(restau, options))
-      && cuisinePresent(cuisinesRestau ,selectCuisines)
+      && cuisinePresent(cuisinesRestaux ,restau)
       ) {
         res.add(restau);
       }
     }
     _currentRestaurants = res;
+    print('bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb');
   }
 
   bool sameCategorie(String viewCat, String  modType){
@@ -110,18 +117,13 @@ class RestaurantRepository{
     return true; // Si aucune condition n'a retourné false, alors toutes les options sont respectées.
   }
 
-  bool cuisinePresent(List<String> cuisines, List<String>? selectCuisines) {
-    if (selectCuisines == null || selectCuisines.isEmpty) {
+  bool cuisinePresent(Set<String> cuisinesRestaux, Restaurant restaurant) {
+    if (cuisinesRestaux.isEmpty) {
       return true; // Aucun filtre appliqué sur les cuisines
     }
-
-    for (String selected in selectCuisines) {
-      if (cuisines.contains(selected)) {
-        return true; // Une correspondance trouvée
-      }
-    }
-    return false; // Aucune correspondance trouvée
+    return cuisinesRestaux.contains(restaurant.osmid);
   }
+
 
 
 

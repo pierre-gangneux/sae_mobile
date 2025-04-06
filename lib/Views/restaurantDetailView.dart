@@ -6,6 +6,7 @@ import '../Model/Like/Like.dart';
 import '../Model/Restaurant/Restaurant.dart';
 import '../ViewModels/LikeViewModel.dart';
 import '../ViewModels/connexionViewModel.dart';
+import '../ViewModels/cuisineViewModel.dart';
 import '../ViewModels/restaurantViewModel.dart';
 
 class RestaurantDetailView extends StatefulWidget {
@@ -153,6 +154,33 @@ class _RestaurantDetailViewState extends State<RestaurantDetailView> {
                       if (widget.restaurant.fauteuilRoulant == "yes") _buildChip("Accès PMR"),
                     ],
                   ),
+
+                  SizedBox(height: 16),
+
+                  Text(
+                    "Cuisines Disponibles",
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  ),
+                  SizedBox(height: 8),
+                  FutureBuilder<List<String>>(
+                    future: context.read<CuisineViewModel>().getCuisinesRestaurant(widget.restaurant),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return CircularProgressIndicator();
+                      } else if (snapshot.hasError) {
+                        return Text("Erreur lors du chargement des cuisines");
+                      } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                        return Text("Aucune cuisine disponible.");
+                      }
+
+                      final cuisines = snapshot.data!;
+                      return Wrap(
+                        spacing: 8.0,
+                        children: cuisines.map((cuisine) => _buildChip(cuisine)).toList(),
+                      );
+                    },
+                  ),
+
 
                   SizedBox(height: 16),
 
