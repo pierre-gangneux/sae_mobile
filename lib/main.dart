@@ -2,26 +2,25 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
+import 'package:sae_mobile/Views/Profil/avisView.dart';
+import 'package:sae_mobile/Views/Profil/favorisView.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:sqflite_common_ffi_web/sqflite_ffi_web.dart';
-
-import 'Model/Connexion/authentification.dart';
 import 'ViewModels/avisViewModel.dart';
+import 'Model/Connexion/authentification.dart';
 import 'ViewModels/connexionViewModel.dart';
+import 'Views/connectionView.dart';
 import 'ViewModels/LikeViewModel.dart';
 import 'ViewModels/cuisineViewModel.dart';
-import 'ViewModels/restaurantViewModel.dart';
-import 'Views/connectionView.dart';
 import 'Views/home.dart';
-import 'Views/mapView.dart';
+import 'package:sae_mobile/Views/Profil/profilView.dart';
 import 'Views/navigBottom.dart';
 import 'Views/registerView.dart';
 import 'Views/restaurantDetailView.dart';
 import 'Views/searchView.dart';
-import 'Views/Profil/profilView.dart';
-import 'Views/Profil/avisView.dart';
-import 'Views/Profil/favorisView.dart';
+import 'Views/mapView.dart';
 import 'database.dart';
+import 'ViewModels/restaurantViewModel.dart';
 import 'ViewModels/themeViewModel.dart';
 
 final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'root');
@@ -30,89 +29,29 @@ final GlobalKey<NavigatorState> _sectionANavigatorKey = GlobalKey<NavigatorState
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
+  // Web-only: initialisation de databaseFactory
   if (kIsWeb) {
     databaseFactory = databaseFactoryFfiWeb;
   }
 
+  // AuthState et base de données
+  final authState = AuthState();
   final database = await populateDatabase();
 
-  runApp(MyApp(database: database));
+  runApp(MyApp( database:database, authState:authState));
 }
 
 class MyApp extends StatelessWidget {
   final Database? database;
+  final AuthState authState;
 
-  const MyApp({super.key, required this.database});
+  MyApp({super.key, required this.database, required this.authState});
 
-  @override
-  Widget build(BuildContext context) {
-    return FutureBuilder<AuthState>(
-      future: _initAuthState(),
-      builder: (context, snapshot) {
-        if (!snapshot.hasData) {
-          return MaterialApp(
-            home: Scaffold(body: Center(child: CircularProgressIndicator())),
-          );
-        }
-
-        final authState = snapshot.data!;
-
-        return MultiProvider(
-          providers: [
-            ChangeNotifierProvider<AuthState>.value(value: authState),
-            ChangeNotifierProvider(create: (_) => RestaurantViewModel(database!)),
-            ChangeNotifierProvider(create: (_) => AvisViewModel(database!)),
-            ChangeNotifierProvider(
-              create: (context) {
-                final restaurantVM = Provider.of<RestaurantViewModel>(context, listen: false);
-                return LikeViewModel(database!, restaurantVM.restauRep);
-              },
-            ),
-            ChangeNotifierProvider(create: (_) => CuisineViewModel(database!)),
-            ChangeNotifierProvider(create: (_) => ConnexionViewModel()),
-            ChangeNotifierProvider(create: (_) => ThemeViewModel()),
-          ],
-          child: Builder(
-            builder: (context) {
-              final router = createRouter(context.read<AuthState>(), context);
-              return MaterialApp.router(
-                title: 'SAE Mobile',
-                theme: ThemeData(
-                  primarySwatch: Colors.blue,
-                  bottomNavigationBarTheme: const BottomNavigationBarThemeData(
-                    backgroundColor: Colors.white,
-                    selectedItemColor: Colors.blue,
-                    unselectedItemColor: Colors.grey,
-                    elevation: 5,
-                  ),
-                  cardTheme: CardTheme(color: Colors.grey[600]),
-                  appBarTheme: const AppBarTheme(
-                    backgroundColor: Colors.blue,
-                    elevation: 0,
-                    titleTextStyle: TextStyle(color: Colors.white, fontSize: 20),
-                  ),
-                ),
-                routerConfig: router,
-              );
-            },
-          ),
-        );
-      },
-    );
-  }
-
-  Future<AuthState> _initAuthState() async {
-    final authState = AuthState();
-    await authState.checkLoginStatus();
-    return authState;
-  }
-}
-
-GoRouter createRouter(AuthState authState, BuildContext context) {
-  return GoRouter(
+  late final GoRouter _router = GoRouter(
     navigatorKey: _rootNavigatorKey,
     initialLocation: authState.isSignedIn ? '/home' : '/register',
     redirect: (BuildContext context, GoRouterState state) {
+      final authState = Provider.of<AuthState>(context, listen: false);
       final isLoggingIn = state.matchedLocation == '/connexion';
       final isRegistering = state.matchedLocation == '/register';
 
@@ -152,7 +91,6 @@ GoRouter createRouter(AuthState authState, BuildContext context) {
                       if (restaurant == null) {
                         return Scaffold(body: Center(child: Text('Restaurant non trouvé')));
                       }
-
                       return RestaurantDetailView(restaurant: restaurant);
                     },
                   ),
@@ -208,4 +146,51 @@ GoRouter createRouter(AuthState authState, BuildContext context) {
       );
     },
   );
+
+
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder(
+      future: authState.checkLoginStatus(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return MaterialApp(
+            home: Scaffold(
+              body: Center(child: CircularProgressIndicator()),
+            ),
+          );
+        }
+
+
+        RestaurantViewModel restaurantViewModel = RestaurantViewModel(database!);
+        return MultiProvider(
+          providers: [
+            ChangeNotifierProvider(create: (context) => authState),
+            ChangeNotifierProvider(create: (context) => ThemeViewModel()),
+            ChangeNotifierProvider(create: (context) => restaurantViewModel),
+            ChangeNotifierProvider(create: (context) => AvisViewModel(database!)),
+            ChangeNotifierProvider(
+                create: (context) {
+                  LikeViewModel likeViewModel = LikeViewModel(database!, restaurantViewModel.restauRep);
+                  return likeViewModel;
+                }
+            ),
+
+            ChangeNotifierProvider(create: (context) => CuisineViewModel(database!)),
+            ChangeNotifierProvider(create: (context) => ConnexionViewModel()),
+          ],
+          child: Consumer<ThemeViewModel>(
+            builder: (context, themeViewModel, child) {
+              return MaterialApp.router(
+                title: 'SAE Mobile',
+                theme: themeViewModel.currentTheme,
+                routerConfig: _router,
+              );
+            },
+          ),
+        );
+      },
+    );
+  }
 }
