@@ -8,10 +8,10 @@ import '../ViewModels/restaurantViewModel.dart';
 
 class SearchView extends StatefulWidget {
   @override
-  _SearchViewState createState() => _SearchViewState();
+  SearchViewState createState() => SearchViewState();
 }
 
-class _SearchViewState extends State<SearchView> {
+class SearchViewState extends State<SearchView> {
   final _formKey = GlobalKey<FormBuilderState>();
 
   @override

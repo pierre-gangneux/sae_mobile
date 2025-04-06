@@ -1,5 +1,4 @@
 import 'package:flutter/foundation.dart'; // Pour ChangeNotifier
-import 'package:sae_mobile/Model/Restaurant/Restaurant.dart';
 import 'package:sqflite/sqflite.dart';
 import '../Model/Cuisine/CuisineRepository.dart';
 

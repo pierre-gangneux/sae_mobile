@@ -101,7 +101,7 @@ CREATE TABLE CUISINE_FAVORITES(
 CREATE TABLE AVIS(
     username VARCHAR(32),
     osmid VARCHAR(32),
-    note SMALLINT CHECK (note <= 0 AND note >= 5),
+    note SMALLINT CHECK (note >= 0 AND note <= 5),
     commentaire VARCHAR(255),
 
     PRIMARY KEY (username, osmid),

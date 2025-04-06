@@ -2,10 +2,11 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
-import 'package:sae_mobile/Views/Profil/commentsView.dart';
+import 'package:sae_mobile/Views/Profil/avisView.dart';
 import 'package:sae_mobile/Views/Profil/favorisView.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:sqflite_common_ffi_web/sqflite_ffi_web.dart';
+import 'ViewModels/avisViewModel.dart';
 import 'Model/Connexion/authentification.dart';
 import 'ViewModels/connexionViewModel.dart';
 import 'Views/connectionView.dart';
@@ -36,7 +37,7 @@ void main() async {
   final authState = AuthState();
   final database = await populateDatabase();
 
-  runApp(MyApp(database: database, authState: authState));
+  runApp(MyApp( database:database, authState:authState));
 }
 
 class MyApp extends StatelessWidget {
@@ -44,6 +45,108 @@ class MyApp extends StatelessWidget {
   final AuthState authState;
 
   MyApp({super.key, required this.database, required this.authState});
+
+  late final GoRouter _router = GoRouter(
+    navigatorKey: _rootNavigatorKey,
+    initialLocation: authState.isSignedIn ? '/home' : '/register',
+    redirect: (BuildContext context, GoRouterState state) {
+      final authState = Provider.of<AuthState>(context, listen: false);
+      final isLoggingIn = state.matchedLocation == '/connexion';
+      final isRegistering = state.matchedLocation == '/register';
+
+      if (!authState.isSignedIn) {
+        if (isLoggingIn || isRegistering) return null;
+        return '/register';
+      }
+
+      return null;
+    },
+    routes: <RouteBase>[
+      StatefulShellRoute.indexedStack(
+        builder: (context, state, navigationShell) => NavigBottom(navigationShell: navigationShell),
+        branches: <StatefulShellBranch>[
+          StatefulShellBranch(
+            navigatorKey: _sectionANavigatorKey,
+            routes: <RouteBase>[
+              GoRoute(
+                path: '/home',
+                builder: (context, state) => Home(),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: <RouteBase>[
+              GoRoute(
+                path: '/restaurants',
+                builder: (context, state) => SearchView(),
+                routes: [
+                  GoRoute(
+                    path: ':id',
+                    builder: (context, state) {
+                      final restaurantId = state.pathParameters['id']!;
+                      final restaurantVM = Provider.of<RestaurantViewModel>(context, listen: false);
+                      final restaurant = restaurantVM.getRestaurantById(restaurantId);
+
+                      if (restaurant == null) {
+                        return Scaffold(body: Center(child: Text('Restaurant non trouvé')));
+                      }
+                      return RestaurantDetailView(restaurant: restaurant);
+                    },
+                  ),
+                ],
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: <RouteBase>[
+              GoRoute(
+                path: '/map',
+                builder: (context, state) => MapView(),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: <RouteBase>[
+              GoRoute(
+                path: '/profile',
+                builder: (context, state) => ProfilView(),
+                routes: [
+                  GoRoute(
+                    path: 'favoris',
+                    builder: (context, state) => FavorisView(),
+                  ),
+                  GoRoute(
+                    path: 'avis',
+                    builder: (context, state) => AvisView(),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ],
+      ),
+      GoRoute(
+        path: '/register',
+        builder: (context, state) => const RegisterView(),
+      ),
+      GoRoute(
+        path: '/connexion',
+        builder: (context, state) => const ConnectionView(),
+      ),
+    ],
+    errorPageBuilder: (context, state) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        context.go('/home');
+      });
+      return MaterialPage(
+        child: Scaffold(
+          body: Home(),
+        ),
+      );
+    },
+  );
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -58,120 +161,22 @@ class MyApp extends StatelessWidget {
           );
         }
 
-        final GoRouter _router = GoRouter(
-          navigatorKey: _rootNavigatorKey,
-          initialLocation: authState.isSignedIn ? '/home' : '/register',
-          redirect: (BuildContext context, GoRouterState state) {
-            final authState = Provider.of<AuthState>(context, listen: false);
-            final isLoggingIn = state.matchedLocation == '/connexion';
-            final isRegistering = state.matchedLocation == '/register';
 
-            if (!authState.isSignedIn) {
-              if (isLoggingIn || isRegistering) return null;
-              return '/register';
-            }
-
-            return null;
-          },
-          routes: <RouteBase>[
-            StatefulShellRoute.indexedStack(
-              builder: (context, state, navigationShell) => NavigBottom(navigationShell: navigationShell),
-              branches: <StatefulShellBranch>[
-                StatefulShellBranch(
-                  navigatorKey: _sectionANavigatorKey,
-                  routes: <RouteBase>[
-                    GoRoute(
-                      path: '/home',
-                      builder: (context, state) => Home(),
-                    ),
-                  ],
-                ),
-                StatefulShellBranch(
-                  routes: <RouteBase>[
-                    GoRoute(
-                      path: '/restaurants',
-                      builder: (context, state) => SearchView(),
-                      routes: [
-                        GoRoute(
-                          path: ':id',
-                          builder: (context, state) {
-                            final restaurantId = state.pathParameters['id']!;
-                            final restaurantVM = Provider.of<RestaurantViewModel>(context);
-                            final restaurant = restaurantVM.getRestaurantById(restaurantId);
-
-                            if (restaurant == null) {
-                              return Scaffold(body: Center(child: Text('Restaurant non trouvé')));
-                            }
-
-                            return RestaurantDetailView(restaurant: restaurant);
-                          },
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-                StatefulShellBranch(
-                  routes: <RouteBase>[
-                    GoRoute(
-                      path: '/map',
-                      builder: (context, state) => MapView(),
-                    ),
-                  ],
-                ),
-                StatefulShellBranch(
-                  routes: <RouteBase>[
-                    GoRoute(
-                      path: '/profile',
-                      builder: (context, state) => ProfilView(),
-                      routes: [
-                        GoRoute(
-                          path: 'favoris',
-                          builder: (context, state) => FavorisView(),
-                        ),
-                        GoRoute(
-                          path: 'comments',
-                          builder: (context, state) => CommentsView(),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ],
-            ),
-            GoRoute(
-              path: '/register',
-              builder: (context, state) => const RegisterView(),
-            ),
-            GoRoute(
-              path: '/connexion',
-              builder: (context, state) => const ConnectionView(),
-            ),
-          ],
-          errorPageBuilder: (context, state) {
-            WidgetsBinding.instance.addPostFrameCallback((_) {
-              context.go('/home');
-            });
-            return MaterialPage(
-              child: Scaffold(
-                body: Home(),
-              ),
-            );
-          },
-        );
-
+        RestaurantViewModel restaurantViewModel = RestaurantViewModel(database!);
         return MultiProvider(
           providers: [
-            ChangeNotifierProvider(create: (_) => authState),
-            ChangeNotifierProvider(create: (_) => RestaurantViewModel(database!)),
-
-            ChangeNotifierProxyProvider<RestaurantViewModel, LikeViewModel>(
-              create: (context) => LikeViewModel(database!, context.read<RestaurantViewModel>().restauRep),
-              update: (context, restauViewModel, previousLikeVM) =>
-                  LikeViewModel(database!, restauViewModel.restauRep),
+            ChangeNotifierProvider(create: (context) => authState),
+            ChangeNotifierProvider(create: (context) => restaurantViewModel),
+            ChangeNotifierProvider(create: (context) => AvisViewModel(database!)),
+            ChangeNotifierProvider(
+                create: (context) {
+                  LikeViewModel likeViewModel = LikeViewModel(database!, restaurantViewModel.restauRep);
+                  return likeViewModel;
+                }
             ),
 
-            ChangeNotifierProvider(create: (_) => CuisineViewModel(database!)),
-            ChangeNotifierProvider(create: (_) => ConnexionViewModel()),
+            ChangeNotifierProvider(create: (context) => CuisineViewModel(database!)),
+            ChangeNotifierProvider(create: (context) => ConnexionViewModel()),
           ],
           child: Consumer<RestaurantViewModel>(
             builder: (context, restaurantViewModel, child) {

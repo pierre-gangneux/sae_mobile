@@ -1,14 +1,16 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-class CommentsView extends StatefulWidget {
-  const CommentsView({super.key});
+import '../Avis/avisSectionView.dart';
+
+class AvisView extends StatefulWidget {
+  const AvisView({super.key});
 
   @override
-  State<CommentsView> createState() => _CommentsViewState();
+  State<AvisView> createState() => _AvisViewState();
 }
 
-class _CommentsViewState extends State<CommentsView> {
+class _AvisViewState extends State<AvisView> {
 
   @override
   Widget build(BuildContext context) {
@@ -16,10 +18,10 @@ class _CommentsViewState extends State<CommentsView> {
         appBar: AppBar(
           title: Padding(
               padding: const EdgeInsets.all(8.0),
-              child: Text("Vos commentaires")
+              child: Text("Vos avis")
           ),
         ),
-        body: Center(child: Text("Commentaires"))
+        body: AvisSectionView()
     );
   }
 }

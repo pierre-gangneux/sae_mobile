@@ -5,7 +5,7 @@ class ConnexionViewModel extends ChangeNotifier{
   late LoginModel connexion;
 
   ConnexionViewModel(){
-    connexion = new LoginModel();
+    connexion = LoginModel();
     notifyListeners();
   }
 
