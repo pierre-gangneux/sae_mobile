@@ -68,30 +68,17 @@ class MyApp extends StatelessWidget {
                 return LikeViewModel(database!, restaurantVM.restauRep);
               },
             ),
+            ChangeNotifierProvider(create: (context) => ThemeViewModel()),
             ChangeNotifierProvider(create: (_) => CuisineViewModel(database!)),
             ChangeNotifierProvider(create: (_) => ConnexionViewModel()),
             ChangeNotifierProvider(create: (_) => ThemeViewModel()),
           ],
-          child: Builder(
-            builder: (context) {
+          child: Consumer<ThemeViewModel>(
+            builder: (context, themeViewModel, child) {
               final router = createRouter(context.read<AuthState>(), context);
               return MaterialApp.router(
                 title: 'SAE Mobile',
-                theme: ThemeData(
-                  primarySwatch: Colors.blue,
-                  bottomNavigationBarTheme: const BottomNavigationBarThemeData(
-                    backgroundColor: Colors.white,
-                    selectedItemColor: Colors.blue,
-                    unselectedItemColor: Colors.grey,
-                    elevation: 5,
-                  ),
-                  cardTheme: CardTheme(color: Colors.grey[600]),
-                  appBarTheme: const AppBarTheme(
-                    backgroundColor: Colors.blue,
-                    elevation: 0,
-                    titleTextStyle: TextStyle(color: Colors.white, fontSize: 20),
-                  ),
-                ),
+                theme: themeViewModel.currentTheme,
                 routerConfig: router,
               );
             },

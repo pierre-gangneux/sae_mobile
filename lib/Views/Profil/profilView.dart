@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:settings_ui/settings_ui.dart';
 import '../../Model/Connexion/authentification.dart'; // importe AuthState
+import '../../ViewModels/themeViewModel.dart';
 
 class ProfilView extends StatefulWidget {
   const ProfilView({super.key});
@@ -16,6 +17,7 @@ class _ProfilViewState extends State<ProfilView> {
   @override
   Widget build(BuildContext context) {
     final authState = Provider.of<AuthState>(context, listen: false);
+    final themeViewModel = Provider.of<ThemeViewModel>(context, listen: true);
 
     return Scaffold(
       appBar: AppBar(
@@ -57,12 +59,12 @@ class _ProfilViewState extends State<ProfilView> {
             title: Text("Paramètres"),
             tiles: [
               SettingsTile.switchTile(
-                initialValue: true,
-                title: Text('Changer de thème'),
-                description: Text("WIP"),
-                leading: Icon(Icons.contrast),
+                initialValue: themeViewModel.isDarkMode, // Use the current theme state
+                title: const Text('Changer de thème'),
+                description: const Text("Basculer entre le mode clair et sombre"),
+                leading: const Icon(Icons.contrast),
                 onToggle: (_) {
-                  // Changer de thème
+                  themeViewModel.toggleTheme(); // Toggle the theme
                 },
               ),
               SettingsTile(
