@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
-import 'package:flutter_rating_bar/flutter_rating_bar.dart'; // Import the rating bar package
-import '../Model/Restaurant/Restaurant.dart'; // Adjust the import path as needed
+import 'package:flutter_rating_bar/flutter_rating_bar.dart';
+import 'package:geolocator/geolocator.dart'; // Import geolocator package
+import '../Model/Restaurant/Restaurant.dart';
 
 class MapView extends StatefulWidget {
   const MapView({super.key});
@@ -40,8 +41,49 @@ class MapViewState extends State<MapView> {
     ),
   ];
 
-  // State variable to track the selected restaurant
+  // State variables
   String? selectedOsmid;
+  LatLng? userLocation; // User's geolocation
+  final MapController _mapController = MapController(); // Map controller
+
+  @override
+  void initState() {
+    super.initState();
+    _getUserLocation(); // Get user's geolocation on initialization
+  }
+
+  Future<void> _getUserLocation() async {
+    bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      debugPrint("Location services are disabled.");
+      return;
+    }
+
+    LocationPermission permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        debugPrint("Location permissions are denied.");
+        return;
+      }
+    }
+
+    if (permission == LocationPermission.deniedForever) {
+      debugPrint("Location permissions are permanently denied.");
+      return;
+    }
+
+    Position position = await Geolocator.getCurrentPosition(
+      locationSettings: LocationSettings(accuracy: LocationAccuracy.best),
+    );
+
+    setState(() {
+      userLocation = LatLng(position.latitude, position.longitude);
+    });
+
+    // Move the map to the user's location
+    _mapController.move(userLocation!, 13.0);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -51,8 +93,9 @@ class MapViewState extends State<MapView> {
         children: [
           // FlutterMap widget
           FlutterMap(
+            mapController: _mapController,
             options: MapOptions(
-              initialCenter: LatLng(48.8566, 2.3522), // Center of the map
+              initialCenter: userLocation ?? LatLng(48.8566, 2.3522), // Center of the map
               initialZoom: 13.0,
             ),
             children: [
@@ -61,8 +104,20 @@ class MapViewState extends State<MapView> {
                 subdomains: ['a', 'b', 'c'],
               ),
               MarkerLayer(
-                markers: restaurants.map((restaurant) {
-                  return Marker(
+                markers: [
+                  // User location marker
+                  if (userLocation != null)
+                    Marker(
+                      point: userLocation!,
+                      child: const Icon(
+                        Icons.location_pin,
+                        color: Colors.blue,
+                        size: 40.0,
+                      ),
+                    ),
+                  // Restaurant markers
+                  ...restaurants.map((restaurant) {
+                    return Marker(
                     point: LatLng(
                       double.parse(restaurant.latitude ?? "0"),
                       double.parse(restaurant.longitude ?? "0"),
@@ -130,6 +185,19 @@ class MapViewState extends State<MapView> {
                   );
                 },
               ),
+            ),
+          ),
+          // Reset position button
+          Positioned(
+            bottom: 16,
+            right: 16,
+            child: FloatingActionButton(
+              onPressed: () {
+                if (userLocation != null) {
+                  _mapController.move(userLocation!, 13.0);
+                }
+              },
+              child: const Icon(Icons.my_location),
             ),
           ),
         ],
