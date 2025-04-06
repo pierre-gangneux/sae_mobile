@@ -19,5 +19,10 @@ class CuisineViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
+  Future<List<String>> getCuisinesRestaurant(restaurant) async {
+    await cuisineRepository.loadCuisinesRestaurant(restaurant);
+    return cuisineRepository.getCuisinesRestaurant();
+  }
+
 
 }
