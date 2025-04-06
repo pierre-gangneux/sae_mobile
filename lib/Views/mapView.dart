@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:flutter_rating_bar/flutter_rating_bar.dart'; // Import the rating bar package
 import '../Model/Restaurant/Restaurant.dart'; // Adjust the import path as needed
 
 class MapView extends StatefulWidget {
   const MapView({super.key});
-  
+
   @override
   MapViewState createState() => MapViewState();
 }
@@ -39,10 +40,13 @@ class MapViewState extends State<MapView> {
     ),
   ];
 
+  // State variable to track the selected restaurant
+  String? selectedOsmid;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Map with Restaurants")),
+      appBar: AppBar(title: const Text("Map with Restaurants")),
       body: Stack(
         children: [
           // FlutterMap widget
@@ -62,13 +66,23 @@ class MapViewState extends State<MapView> {
                     point: LatLng(
                       double.parse(restaurant.latitude ?? "0"),
                       double.parse(restaurant.longitude ?? "0"),
-                    ),                    child: Tooltip(
+                    ),
+                    child: Tooltip(
                       message: restaurant.nomRestaurant,
                       child: IconButton(
-                        icon: Icon(Icons.location_pin),
+                        iconSize: restaurant.osmid == selectedOsmid ? 40.0 : 30.0,
+                        icon: Icon(
+                          Icons.location_pin,
+                          color: restaurant.osmid == selectedOsmid
+                              ? Colors.red
+                              : Colors.grey,
+                        ),
                         onPressed: () {
-                          // Handle marker tap
-                          debugPrint("Tapped on ${restaurant.nomRestaurant}");
+                          // Update the selected restaurant
+                          setState(() {
+                            selectedOsmid = restaurant.osmid;
+                          });
+                          debugPrint("Selected ${restaurant.nomRestaurant}");
                         },
                       ),
                     ),
@@ -89,10 +103,29 @@ class MapViewState extends State<MapView> {
                 itemBuilder: (context, index) {
                   return ListTile(
                     title: Text(restaurants[index].nomRestaurant),
-                    subtitle: Text("${restaurants[index].type} - ${restaurants[index].etoiles}⭐"),
+                    subtitle: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(restaurants[index].type),
+                        const SizedBox(height: 4),
+                        RatingBarIndicator(
+                          rating: restaurants[index].etoiles.toDouble(),
+                          itemBuilder: (context, index) => const Icon(
+                            Icons.star,
+                            color: Colors.amber,
+                          ),
+                          itemCount: 5,
+                          itemSize: 20.0,
+                          direction: Axis.horizontal,
+                        ),
+                      ],
+                    ),
                     onTap: () {
-                      // Handle restaurant tap
-                      debugPrint("Tapped on ${restaurants[index].nomRestaurant}");
+                      // Update the selected restaurant when tapped in the list
+                      setState(() {
+                        selectedOsmid = restaurants[index].osmid;
+                      });
+                      debugPrint("Selected ${restaurants[index].nomRestaurant}");
                     },
                   );
                 },
