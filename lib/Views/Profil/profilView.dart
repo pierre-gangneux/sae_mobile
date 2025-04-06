@@ -3,8 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:settings_ui/settings_ui.dart';
-import '../../ViewModels/themeViewModel.dart';
-import '../../Model/Connexion/authentification.dart';
+import '../../Model/Connexion/authentification.dart'; // importe AuthState
 
 class ProfilView extends StatefulWidget {
   const ProfilView({super.key});
@@ -16,24 +15,24 @@ class ProfilView extends StatefulWidget {
 class _ProfilViewState extends State<ProfilView> {
   @override
   Widget build(BuildContext context) {
-    final themeViewModel = Provider.of<ThemeViewModel>(context, listen: true); 
+    final authState = Provider.of<AuthState>(context, listen: false);
 
     return Scaffold(
       appBar: AppBar(
-        title: const Padding(
-          padding: EdgeInsets.all(8.0),
+        title: Padding(
+          padding: const EdgeInsets.all(8.0),
           child: Text("Votre Profil"),
         ),
       ),
       body: SettingsList(
         sections: [
           SettingsSection(
-            margin: const EdgeInsetsDirectional.all(16),
+            margin: EdgeInsetsDirectional.all(16),
             tiles: [
               SettingsTile.navigation(
-                title: const Text('Mes favoris'),
-                description: const Text('Permet de consulter ces favoris'),
-                leading: const Icon(Icons.favorite),
+                title: Text('Mes favoris'),
+                description: Text('Permet de consulter ces favoris'),
+                leading: Icon(Icons.favorite),
                 onPressed: (_) {
                   context.go('/profile/favoris');
                 },
@@ -41,12 +40,12 @@ class _ProfilViewState extends State<ProfilView> {
             ],
           ),
           SettingsSection(
-            margin: const EdgeInsetsDirectional.all(16),
+            margin: EdgeInsetsDirectional.all(16),
             tiles: [
               SettingsTile.navigation(
-                title: const Text('Mes avis'),
-                description: const Text('Permet de consulter ces avis'),
-                leading: const Icon(Icons.comment),
+                title: Text('Mes avis'),
+                description: Text('Permet de consulter ces avis'),
+                leading: Icon(Icons.comment),
                 onPressed: (_) {
                   context.go('/profile/avis');
                 },
@@ -54,27 +53,27 @@ class _ProfilViewState extends State<ProfilView> {
             ],
           ),
           SettingsSection(
-            margin: const EdgeInsetsDirectional.all(16),
-            title: const Text("Paramètres"),
+            margin: EdgeInsetsDirectional.all(16),
+            title: Text("Paramètres"),
             tiles: [
               SettingsTile.switchTile(
-                initialValue: themeViewModel.isDarkMode, // Use the current theme state
-                title: const Text('Changer de thème'),
-                description: const Text("Basculer entre le mode clair et sombre"),
-                leading: const Icon(Icons.contrast),
+                initialValue: true,
+                title: Text('Changer de thème'),
+                description: Text("WIP"),
+                leading: Icon(Icons.contrast),
                 onToggle: (_) {
-                  themeViewModel.toggleTheme(); // Toggle the theme
+                  // Changer de thème
                 },
               ),
               SettingsTile(
-                title: const Text('Me déconnecter'),
-                description: const Text("logout"),
-                leading: const Icon(Icons.logout),
-                onPressed: (_) {
-                  debugPrint("logout");
-                  AuthState().signOut().then((_) {
-                    context.go('/register');
-                  });
+                title: Text('Me déconnecter'),
+                description: Text("Déconnexion de votre compte"),
+                leading: Icon(Icons.logout),
+                onPressed: (_) async {
+                  await authState.signOut();
+                  if (context.mounted) {
+                    context.go('/connexion');
+                  }
                 },
               ),
             ],

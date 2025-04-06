@@ -71,18 +71,6 @@ class RestaurantViewModel extends ChangeNotifier{
     return viewedRestaurants;
   }
 
-  List<Restaurant> getRestaurantsInBounds({
-    required double minLatitude,
-    required double maxLatitude,
-    required double minLongitude,
-    required double maxLongitude,
-  }) {
-    return restauRep.getRestaurantsInBounds(
-      minLatitude: minLatitude,
-      maxLatitude: maxLatitude,
-      minLongitude: minLongitude,
-      maxLongitude: maxLongitude,
-    );
-  }
+
 
 }
