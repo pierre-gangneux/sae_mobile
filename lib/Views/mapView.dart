@@ -190,7 +190,7 @@ class MapViewState extends State<MapView> {
                                 // Navigate to the restaurant's page
                                 Navigator.pushNamed(
                                   context,
-                                  '/restaurant/${restaurant.osmid}',
+                                  '/restaurants/${restaurant.osmid}',
                                 );
                               },
                               child: const Text("Go to Page"),
