@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/material.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import 'package:flutter/services.dart' show rootBundle;
@@ -22,7 +23,7 @@ Future<Database> initDatabase() async {
           await db.execute(query.trim() + ';');  // Assure la fin de la requête
         }
       }
-      print("Base de données et tables créées avec succès !");
+      debugPrint("Base de données et tables créées avec succès !");
       showTables(db);
     },
   );
@@ -31,7 +32,7 @@ Future<void> showTables(Database db) async {
   // Liste les tables dans la base de données SQLite
   List<Map<String, dynamic>> result = await db.rawQuery("SELECT name FROM sqlite_master WHERE type='table';");
   result.forEach((table) {
-    print('Table: ${table['name']}');
+    debugPrint('Table: ${table['name']}');
   });
 }
 
@@ -48,7 +49,7 @@ Future<Database> populateDatabase() async {
     await insertRestaurant(db, item);
     await insertCuisine(db, item);
   }
-  print("Base de données remplie avec succès !");
+  debugPrint("Base de données remplie avec succès !");
   /*showRestaurant(db);*/
   return db;
 }
@@ -123,6 +124,6 @@ Future<void> showRestaurant(Database db) async {
   // Affiche chaque ligne de la table
   result.forEach((row) {
     // Affiche toutes les colonnes pour chaque ligne
-    print('Restaurant: $row');
+    debugPrint('Restaurant: $row');
   });
 }

@@ -13,7 +13,7 @@ class Avis {
   String get commentaire => _commentaire;
 
   // Setters
-  void set note(int note) => {if (0 <= note && note <= 5){this._note = note}};
+  void set note(int note) => {if (0 <= note && note <= 5){_note = note}};
   void set commentaire(String commentaire) => _commentaire = commentaire;
 
   Map<String, Object?> toMap(){

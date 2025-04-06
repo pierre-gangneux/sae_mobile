@@ -38,7 +38,7 @@ class _RestaurantDetailViewState extends State<RestaurantDetailView> {
   Widget build(BuildContext context) {
     final username = context.read<ConnexionViewModel>().getUsername()!;
     final likeViewModel = context.read<LikeViewModel>();
-    print('rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr');
+    debugPrint('rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr');
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.restaurant.nomRestaurant),

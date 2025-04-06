@@ -1,7 +1,5 @@
-import 'package:sae_mobile/Model/Cuisine/Cuisine.dart';
 import 'package:sqflite/sqflite.dart';
 
-import '../../ViewModels/cuisineViewModel.dart';
 import '../Cuisine/CuisineRepository.dart';
 import 'Restaurant.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -130,7 +128,7 @@ class RestaurantRepository{
   void saveRestaurant(String osmid) async {
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
 
-    List<String> viewedRestaurants = await this.getViewedOsmid();
+    List<String> viewedRestaurants = await getViewedOsmid();
 
     // Si le restaurant existe déjà, on le supprime de la liste avant de le remettre au début
     if (viewedRestaurants.contains(osmid)) {

@@ -1,6 +1,4 @@
-import 'package:sqflite/sqflite.dart';
 
-import 'Restaurant/Restaurant.dart';
 
 class User {
   String username;

@@ -2,7 +2,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 import 'package:sae_mobile/Model/Cuisine/CuisineRepository.dart';
 import 'package:sae_mobile/Model/Restaurant/Restaurant.dart';
-import 'package:sqflite/sqflite.dart';
 
 import '../Restaurant/restaurantRepository.mocks.dart';
 

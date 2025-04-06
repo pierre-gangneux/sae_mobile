@@ -6,7 +6,7 @@ class ViewRestaurant extends StatelessWidget {
   final Axis axis; // Propriété pour définir l'axe de défilement
   final List<Restaurant> _restaurants; // Liste des restaurants
 
-  ViewRestaurant({
+  const ViewRestaurant({
     super.key,
     required this.axis,
     required List<Restaurant> restaurants,

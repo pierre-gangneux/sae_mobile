@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:crypto/crypto.dart';
+import 'package:flutter/material.dart';
 import 'package:sqflite/sqflite.dart';
 
 class RegisterModel {
@@ -65,7 +66,7 @@ class RegisterModel {
       );
       return true;
     } catch (e) {
-      print("Erreur lors de l'inscription : $e");
+      debugPrint("Erreur lors de l'inscription : $e");
       return false;
     }
   }
