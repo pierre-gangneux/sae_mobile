@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
-import 'package:geolocator/geolocator.dart'; // Import geolocator package
-import '../Model/Restaurant/Restaurant.dart';
+import 'package:provider/provider.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:sae_mobile/ViewModels/restaurantViewModel.dart';
+import 'package:flutter_map_cancellable_tile_provider/flutter_map_cancellable_tile_provider.dart';
 
 class MapView extends StatefulWidget {
   const MapView({super.key});
@@ -13,35 +15,6 @@ class MapView extends StatefulWidget {
 }
 
 class MapViewState extends State<MapView> {
-  // Sample list of restaurants
-  final List<Restaurant> restaurants = [
-    Restaurant(
-      osmid: "1",
-      nomRestaurant: "Restaurant A",
-      type: "Italian",
-      etoiles: 4,
-      latitude: "48.8566",
-      longitude: "2.3522",
-    ),
-    Restaurant(
-      osmid: "2",
-      nomRestaurant: "Restaurant B",
-      type: "French",
-      etoiles: 5,
-      latitude: "48.8566",
-      longitude: "2.3622",
-    ),
-    Restaurant(
-      osmid: "3",
-      nomRestaurant: "Restaurant C",
-      type: "Japanese",
-      etoiles: 3,
-      latitude: "48.8566",
-      longitude: "2.3722",
-    ),
-  ];
-
-  // State variables
   String? selectedOsmid;
   LatLng? userLocation; // User's geolocation
   final MapController _mapController = MapController(); // Map controller
@@ -49,7 +22,7 @@ class MapViewState extends State<MapView> {
   @override
   void initState() {
     super.initState();
-    _getUserLocation(); // Get user's geolocation on initialization
+    _getUserLocation(); 
   }
 
   Future<void> _getUserLocation() async {
@@ -87,21 +60,39 @@ class MapViewState extends State<MapView> {
 
   @override
   Widget build(BuildContext context) {
+    final restaurantViewModel = Provider.of<RestaurantViewModel>(context);
+
+    // Get the current map bounds
+    final bounds = GoogleMapController.getVisibleRegion();
+    final restaurantsInBounds = bounds != null
+        ? restaurantViewModel.getRestaurantsInBounds(
+            minLatitude: bounds.southWest.latitude,
+            maxLatitude: bounds.northEast.latitude,
+            minLongitude: bounds.southWest.longitude,
+            maxLongitude: bounds.northEast.longitude,
+          )
+        : [];
+
     return Scaffold(
       appBar: AppBar(title: const Text("Map with Restaurants")),
       body: Stack(
         children: [
-          // FlutterMap widget
           FlutterMap(
             mapController: _mapController,
             options: MapOptions(
-              initialCenter: userLocation ?? LatLng(48.8566, 2.3522), // Center of the map
+              initialCenter: userLocation ?? LatLng(48.8566, 2.3522),
               initialZoom: 13.0,
+              onPositionChanged: (position, hasGesture) {
+                setState(() {
+                  // Update restaurants when the map position changes
+                });
+              },
             ),
             children: [
               TileLayer(
                 urlTemplate: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
                 subdomains: ['a', 'b', 'c'],
+                tileProvider: CancellableNetworkTileProvider(),
               ),
               MarkerLayer(
                 markers: [
@@ -116,32 +107,32 @@ class MapViewState extends State<MapView> {
                       ),
                     ),
                   // Restaurant markers
-                  ...restaurants.map((restaurant) {
+                  ...restaurantsInBounds.map((restaurant) {
                     return Marker(
-                    point: LatLng(
-                      double.parse(restaurant.latitude ?? "0"),
-                      double.parse(restaurant.longitude ?? "0"),
-                    ),
-                    child: Tooltip(
-                      message: restaurant.nomRestaurant,
-                      child: IconButton(
-                        iconSize: restaurant.osmid == selectedOsmid ? 40.0 : 30.0,
-                        icon: Icon(
-                          Icons.location_pin,
-                          color: restaurant.osmid == selectedOsmid
-                              ? Colors.red
-                              : Colors.grey,
-                        ),
-                        onPressed: () {
-                          // Update the selected restaurant
-                          setState(() {
-                            selectedOsmid = restaurant.osmid;
-                          });
-                          debugPrint("Selected ${restaurant.nomRestaurant}");
-                        },
+                      point: LatLng(
+                        double.parse(restaurant.latitude ?? "0"),
+                        double.parse(restaurant.longitude ?? "0"),
                       ),
-                    ),
-                  );
+                    child: Tooltip(
+                        message: restaurant.nomRestaurant,
+                        child: IconButton(
+                          iconSize: restaurant.osmid == selectedOsmid ? 40.0 : 30.0,
+                          icon: Icon(
+                            Icons.location_pin,
+                            color: restaurant.osmid == selectedOsmid
+                                ? Colors.red
+                                : Colors.grey,
+                          ),
+                          onPressed: () {
+                            // Update the selected restaurant
+                            setState(() {
+                              selectedOsmid = restaurant.osmid;
+                            });
+                            debugPrint("Selected ${restaurant.nomRestaurant}");
+                          },
+                        ),
+                      ),
+                    );
                 })
                 ],
               ),
@@ -155,34 +146,58 @@ class MapViewState extends State<MapView> {
               height: 300, // Adjust height as needed
               color: Colors.white.withValues(alpha: 0.8),
               child: ListView.builder(
-                itemCount: restaurants.length,
+                itemCount: restaurantsInBounds.length,
                 itemBuilder: (context, index) {
-                  return ListTile(
-                    title: Text(restaurants[index].nomRestaurant),
-                    subtitle: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                  final restaurant = restaurantsInBounds[index];
+                  final isSelected = restaurant.osmid == selectedOsmid;
+
+                  return Card(
+                    elevation: isSelected ? 4 : 1,
+                    child: Column(
                       children: [
-                        Text(restaurants[index].type),
-                        const SizedBox(height: 4),
-                        RatingBarIndicator(
-                          rating: restaurants[index].etoiles.toDouble(),
-                          itemBuilder: (context, index) => const Icon(
-                            Icons.star,
-                            color: Colors.amber,
+                        ListTile(
+                          title: Text(restaurant.nomRestaurant),
+                          subtitle: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(restaurant.type),
+                              const SizedBox(height: 4),
+                              RatingBarIndicator(
+                                rating: restaurant.etoiles.toDouble(),
+                                itemBuilder: (context, index) => const Icon(
+                                  Icons.star,
+                                  color: Colors.amber,
+                                ),
+                                itemCount: 5,
+                                itemSize: 20.0,
+                                direction: Axis.horizontal,
+                              ),
+                            ],
                           ),
-                          itemCount: 5,
-                          itemSize: 20.0,
-                          direction: Axis.horizontal,
+                          onTap: () {
+                            // Update the selected restaurant when tapped in the list
+                            setState(() {
+                              selectedOsmid = restaurant.osmid;
+                            });
+                            debugPrint("Selected ${restaurant.nomRestaurant}");
+                          },
                         ),
+                        if (isSelected)
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: ElevatedButton(
+                              onPressed: () {
+                                // Navigate to the restaurant's page
+                                Navigator.pushNamed(
+                                  context,
+                                  '/restaurant/${restaurant.osmid}',
+                                );
+                              },
+                              child: const Text("Go to Page"),
+                            ),
+                          ),
                       ],
                     ),
-                    onTap: () {
-                      // Update the selected restaurant when tapped in the list
-                      setState(() {
-                        selectedOsmid = restaurants[index].osmid;
-                      });
-                      debugPrint("Selected ${restaurants[index].nomRestaurant}");
-                    },
                   );
                 },
               ),
