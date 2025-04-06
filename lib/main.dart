@@ -28,56 +28,49 @@ final GlobalKey<NavigatorState> _sectionANavigatorKey = GlobalKey<NavigatorState
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Initialisation de databaseFactory pour le Web
+  // Web-only: initialisation de databaseFactory
   if (kIsWeb) {
-    databaseFactory = databaseFactoryFfiWeb;  // Initialisation de databaseFactory pour le Web
+    databaseFactory = databaseFactoryFfiWeb;
   }
-  // Appeler la fonction pour initialiser la base de données
+
+  // AuthState et base de données
+  final authState = AuthState();
   final database = await populateDatabase();
 
-  runApp(MyApp(database));
+  runApp(MyApp( database:database, authState:authState));
 }
 
 class MyApp extends StatelessWidget {
   final Database? database;
+  final AuthState authState;
 
-  MyApp(this.database, {super.key});
+  MyApp({super.key, required this.database, required this.authState});
 
-  final GoRouter _router = GoRouter(
+  late final GoRouter _router = GoRouter(
     navigatorKey: _rootNavigatorKey,
-    initialLocation: '/register', // Route initiale
+    initialLocation: authState.isSignedIn ? '/home' : '/register',
     redirect: (BuildContext context, GoRouterState state) {
       final authState = Provider.of<AuthState>(context, listen: false);
-
-      // Vérifie si l'utilisateur essaye de tricher
-      final isLoggingIn = state.matchedLocation == '/Connexion';
+      final isLoggingIn = state.matchedLocation == '/connexion';
       final isRegistering = state.matchedLocation == '/register';
 
-      // Si l'utilisateur essaye de tricher
       if (!authState.isSignedIn) {
-        // A le droit d'aller sur /Connexion ou /register
-        if (isLoggingIn || isRegistering) {
-          return null;
-        }
-        return '/register'; // Renvoie vers /register
+        if (isLoggingIn || isRegistering) return null;
+        return '/register';
       }
 
-      // Sinon c'est bon
       return null;
     },
     routes: <RouteBase>[
       StatefulShellRoute.indexedStack(
-        builder: (BuildContext context, GoRouterState state,
-            StatefulNavigationShell navigationShell) {
-          return NavigBottom(navigationShell: navigationShell);
-        },
+        builder: (context, state, navigationShell) => NavigBottom(navigationShell: navigationShell),
         branches: <StatefulShellBranch>[
           StatefulShellBranch(
             navigatorKey: _sectionANavigatorKey,
             routes: <RouteBase>[
               GoRoute(
                 path: '/home',
-                builder: (BuildContext context, GoRouterState state) => Home(),
+                builder: (context, state) => Home(),
               ),
             ],
           ),
@@ -85,14 +78,15 @@ class MyApp extends StatelessWidget {
             routes: <RouteBase>[
               GoRoute(
                 path: '/restaurants',
-                builder: (BuildContext context, GoRouterState state) => SearchView(),
+                builder: (context, state) => SearchView(),
                 routes: [
                   GoRoute(
                     path: ':id',
-                    builder: (BuildContext context, GoRouterState state) {
-                      final String restaurantId = state.pathParameters['id']!;
-                      final restaurantViewModel = Provider.of<RestaurantViewModel>(context, listen: false);
-                      final restaurant = restaurantViewModel.getRestaurantById(restaurantId);
+                    builder: (context, state) {
+                      final restaurantId = state.pathParameters['id']!;
+                      final restaurantVM = Provider.of<RestaurantViewModel>(context, listen: false);
+                      final restaurant = restaurantVM.getRestaurantById(restaurantId);
+
                       if (restaurant == null) {
                         return Scaffold(body: Center(child: Text('Restaurant non trouvé')));
                       }
@@ -107,7 +101,7 @@ class MyApp extends StatelessWidget {
             routes: <RouteBase>[
               GoRoute(
                 path: '/map',
-                builder: (BuildContext context, GoRouterState state) => MapView(),
+                builder: (context, state) => MapView(),
               ),
             ],
           ),
@@ -115,88 +109,100 @@ class MyApp extends StatelessWidget {
             routes: <RouteBase>[
               GoRoute(
                 path: '/profile',
-                builder: (BuildContext context, GoRouterState state) => ProfilView(),
-                routes: <RouteBase>[
+                builder: (context, state) => ProfilView(),
+                routes: [
                   GoRoute(
-                    path: "favoris",
-                    builder: (BuildContext context, GoRouterState state) => FavorisView(),
+                    path: 'favoris',
+                    builder: (context, state) => FavorisView(),
                   ),
                   GoRoute(
-                    path: "avis",
-                    builder: (BuildContext context, GoRouterState state) => AvisView(),
-                  )
+                    path: 'comments',
+                    builder: (context, state) => AvisView(),
+                  ),
                 ],
               ),
             ],
           ),
         ],
       ),
-      // Route pour la page d'inscription
       GoRoute(
         path: '/register',
-        builder: (BuildContext context, GoRouterState state) => const RegisterView(),
+        builder: (context, state) => const RegisterView(),
       ),
-      // Route pour la page de connexion
       GoRoute(
-        path: '/Connexion',
-        builder: (BuildContext context, GoRouterState state) => const ConnectionView(),
+        path: '/connexion',
+        builder: (context, state) => const ConnectionView(),
       ),
     ],
+    errorPageBuilder: (context, state) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        context.go('/home');
+      });
+      return MaterialPage(
+        child: Scaffold(
+          body: Home(),
+        ),
+      );
+    },
   );
+
+
 
   @override
   Widget build(BuildContext context) {
-    RestaurantViewModel restaurantViewModel = RestaurantViewModel(database!);
-    return MultiProvider(
-      providers: [
-        ChangeNotifierProvider(create: (context) => AuthState()),
-        ChangeNotifierProvider(create: (context) => restaurantViewModel),
-        ChangeNotifierProvider(
-          create: (context) {
-            LikeViewModel likeViewModel = LikeViewModel(database!, restaurantViewModel.restauRep);
-            return likeViewModel;
-          }
-        ),
-        ChangeNotifierProvider(create: (context) => AvisViewModel(database!)),
-        ChangeNotifierProvider(
-            create: (context) {
-              CuisineViewModel cuisineViewModel = CuisineViewModel(database!);
-              return cuisineViewModel;
-            }),
-        ChangeNotifierProvider(
-            create: (context) {
-              ConnexionViewModel connexionViewModel = ConnexionViewModel();
-              return connexionViewModel;
-            })
-      ],
-      child: Consumer<RestaurantViewModel>(
-        builder: (context, restaurantViewModel, child) {
-          return MaterialApp.router(
-            title: 'Flutter Demo',
-            theme: ThemeData(
-              primarySwatch: Colors.blue,
-              bottomNavigationBarTheme: const BottomNavigationBarThemeData(
-                backgroundColor: Colors.white,
-                selectedItemColor: Colors.blue,
-                unselectedItemColor: Colors.grey,
-                elevation: 5,
-              ),
-              cardTheme: CardTheme(
-                color: Colors.grey[600],
-              ),
-              appBarTheme: const AppBarTheme(
-                backgroundColor: Colors.blue,
-                elevation: 0,
-                titleTextStyle: TextStyle(
-                  color: Colors.white,
-                  fontSize: 20,
-                ),
-              ),
+    return FutureBuilder(
+      future: authState.checkLoginStatus(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return MaterialApp(
+            home: Scaffold(
+              body: Center(child: CircularProgressIndicator()),
             ),
-            routerConfig: _router,
           );
-        },
-      ),
+        }
+
+
+        RestaurantViewModel restaurantViewModel = RestaurantViewModel(database!);
+        return MultiProvider(
+          providers: [
+            ChangeNotifierProvider(create: (context) => authState),
+            ChangeNotifierProvider(create: (context) => restaurantViewModel),
+            ChangeNotifierProvider(create: (context) => AvisViewModel(database!)),
+            ChangeNotifierProvider(
+                create: (context) {
+                  LikeViewModel likeViewModel = LikeViewModel(database!, restaurantViewModel.restauRep);
+                  return likeViewModel;
+                }
+            ),
+
+            ChangeNotifierProvider(create: (context) => CuisineViewModel(database!)),
+            ChangeNotifierProvider(create: (context) => ConnexionViewModel()),
+          ],
+          child: Consumer<RestaurantViewModel>(
+            builder: (context, restaurantViewModel, child) {
+              return MaterialApp.router(
+                title: 'SAE Mobile',
+                theme: ThemeData(
+                  primarySwatch: Colors.blue,
+                  bottomNavigationBarTheme: const BottomNavigationBarThemeData(
+                    backgroundColor: Colors.white,
+                    selectedItemColor: Colors.blue,
+                    unselectedItemColor: Colors.grey,
+                    elevation: 5,
+                  ),
+                  cardTheme: CardTheme(color: Colors.grey[600]),
+                  appBarTheme: const AppBarTheme(
+                    backgroundColor: Colors.blue,
+                    elevation: 0,
+                    titleTextStyle: TextStyle(color: Colors.white, fontSize: 20),
+                  ),
+                ),
+                routerConfig: _router,
+              );
+            },
+          ),
+        );
+      },
     );
   }
 }

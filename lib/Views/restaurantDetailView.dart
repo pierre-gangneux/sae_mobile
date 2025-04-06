@@ -19,13 +19,16 @@ class RestaurantDetailView extends StatefulWidget {
 }
 
 class _RestaurantDetailViewState extends State<RestaurantDetailView> {
+  late Future<List<Restaurant?>> _likedFuture;
+
   @override
   void initState() {
     super.initState();
 
-    // Utiliser addPostFrameCallback pour exécuter le code après que l'arbre des widgets soit complètement construit
+    final username = context.read<ConnexionViewModel>().getUsername()!;
+    _likedFuture = context.read<LikeViewModel>().getLike(username);
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      // Sauvegarder le restaurant dans le modèle lorsque la page est initialisée
       final restaurantViewModel = context.read<RestaurantViewModel>();
       restaurantViewModel.saveRestaurant(widget.restaurant.osmid);
     });
@@ -34,7 +37,8 @@ class _RestaurantDetailViewState extends State<RestaurantDetailView> {
   @override
   Widget build(BuildContext context) {
     final username = context.read<ConnexionViewModel>().getUsername()!;
-    final likeViewModel = context.watch<LikeViewModel>();
+    final likeViewModel = context.read<LikeViewModel>();
+    print('rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr');
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.restaurant.nomRestaurant),
@@ -61,7 +65,7 @@ class _RestaurantDetailViewState extends State<RestaurantDetailView> {
                       // Bouton Like
                       FutureBuilder<List<Restaurant?>>(
 
-                        future: likeViewModel.getLike(username),
+                        future: _likedFuture,
                         builder: (context, snapshot) {
                           final likedRestaurants = snapshot.data ?? [];
                           final isLiked = likedRestaurants.any(
@@ -76,6 +80,10 @@ class _RestaurantDetailViewState extends State<RestaurantDetailView> {
                               } else {
                                 likeViewModel.addLike(like);
                               }
+
+                              setState(() {
+                                _likedFuture = likeViewModel.getLike(username); //  Rebuild le FutureBuilder quand le bouton like change
+                              });
                             },
                             child: Icon(
                               Icons.favorite,
