@@ -18,11 +18,12 @@ class MapViewState extends State<MapView> {
   String? selectedOsmid;
   LatLng? userLocation; // User's geolocation
   final MapController _mapController = MapController(); // Map controller
+  LatLngBounds? mapBounds; // Map bounds
 
   @override
   void initState() {
     super.initState();
-    _getUserLocation(); 
+    _getUserLocation();
   }
 
   Future<void> _getUserLocation() async {
@@ -62,14 +63,13 @@ class MapViewState extends State<MapView> {
   Widget build(BuildContext context) {
     final restaurantViewModel = Provider.of<RestaurantViewModel>(context);
 
-    // Get the current map bounds
-    final bounds = GoogleMapController.getVisibleRegion();
-    final restaurantsInBounds = bounds != null
+    // Get the restaurants within the current map bounds
+    final restaurantsInBounds = mapBounds != null
         ? restaurantViewModel.getRestaurantsInBounds(
-            minLatitude: bounds.southWest.latitude,
-            maxLatitude: bounds.northEast.latitude,
-            minLongitude: bounds.southWest.longitude,
-            maxLongitude: bounds.northEast.longitude,
+            minLatitude: mapBounds!.south,
+            maxLatitude: mapBounds!.north,
+            minLongitude: mapBounds!.west,
+            maxLongitude: mapBounds!.east,
           )
         : [];
 
@@ -84,7 +84,7 @@ class MapViewState extends State<MapView> {
               initialZoom: 13.0,
               onPositionChanged: (position, hasGesture) {
                 setState(() {
-                  // Update restaurants when the map position changes
+                  mapBounds = position.visibleBounds;
                 });
               },
             ),
@@ -113,7 +113,7 @@ class MapViewState extends State<MapView> {
                         double.parse(restaurant.latitude ?? "0"),
                         double.parse(restaurant.longitude ?? "0"),
                       ),
-                    child: Tooltip(
+                      child: Tooltip(
                         message: restaurant.nomRestaurant,
                         child: IconButton(
                           iconSize: restaurant.osmid == selectedOsmid ? 40.0 : 30.0,
