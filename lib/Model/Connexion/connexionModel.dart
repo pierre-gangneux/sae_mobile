@@ -48,7 +48,7 @@ class LoginModel {
         return false; // Utilisateur non trouvé
       }
     } catch (e) {
-      debugPrint("Erreur lors de la Connexion : $e");
+      debugPrint("Nom d'utilisateur déja pris : $e");
       return false; // Erreur lors de la connexion
     }
   }
