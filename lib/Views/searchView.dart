@@ -64,7 +64,7 @@ class SearchViewState extends State<SearchView> {
                             ExpansionTile(
                                 title: Text("Cuisine"),
                                 initiallyExpanded: false, // Filtres fermés par défaut
-                                children:[ FormBuilderFilterChips(
+                                children:[ FormBuilderFilterChip(
                                   name: 'cuisine',
                                   decoration: InputDecoration(
                                     border: OutlineInputBorder(),
@@ -83,7 +83,7 @@ class SearchViewState extends State<SearchView> {
                             ExpansionTile(
                               title: Text("Options"),
                               initiallyExpanded: false, // Filtres fermés par défaut
-                              children:[ FormBuilderFilterChips(
+                              children:[ FormBuilderFilterChip(
                                 name: 'options',
                                 decoration: InputDecoration(
                                   //labelText: "Options",
