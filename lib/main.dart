@@ -22,6 +22,7 @@ import 'Views/Profil/profilView.dart';
 import 'Views/Profil/avisView.dart';
 import 'Views/Profil/favorisView.dart';
 import 'database.dart';
+import 'ViewModels/themeViewModel.dart';
 
 final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'root');
 final GlobalKey<NavigatorState> _sectionANavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'sectionANav');
@@ -69,6 +70,7 @@ class MyApp extends StatelessWidget {
             ),
             ChangeNotifierProvider(create: (_) => CuisineViewModel(database!)),
             ChangeNotifierProvider(create: (_) => ConnexionViewModel()),
+            ChangeNotifierProvider(create: (_) => ThemeViewModel()),
           ],
           child: Builder(
             builder: (context) {
