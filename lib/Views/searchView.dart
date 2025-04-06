@@ -125,7 +125,7 @@ class SearchViewState extends State<SearchView> {
               ),
             ),
           ),
-          Expanded(child: ViewRestaurant(axis: Axis.vertical, restaurants: context.watch<RestaurantViewModel>().getRestaurants())),
+          Expanded(child: ViewRestaurant(axis: Axis.vertical, restaurants: context.watch<RestaurantViewModel>().getCurrentRestaurants())),
         ],
       ),
     );

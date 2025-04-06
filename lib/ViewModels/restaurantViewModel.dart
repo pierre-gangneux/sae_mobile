@@ -34,6 +34,10 @@ class RestaurantViewModel extends ChangeNotifier{
   }
 
   List<Restaurant> getRestaurants(){
+    return restauRep.lesRestaurants;
+  }
+
+  List<Restaurant> getCurrentRestaurants(){
     return restauRep.currentRestaurants;
   }
 
