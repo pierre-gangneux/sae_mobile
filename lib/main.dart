@@ -2,7 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
-import 'package:sae_mobile/Views/Profil/commentsView.dart';
+import 'package:sae_mobile/Views/Profil/avisView.dart';
 import 'package:sae_mobile/Views/Profil/favorisView.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:sqflite_common_ffi_web/sqflite_ffi_web.dart';
@@ -122,8 +122,8 @@ class MyApp extends StatelessWidget {
                     builder: (BuildContext context, GoRouterState state) => FavorisView(),
                   ),
                   GoRoute(
-                    path: "comments",
-                    builder: (BuildContext context, GoRouterState state) => CommentsView(),
+                    path: "avis",
+                    builder: (BuildContext context, GoRouterState state) => AvisView(),
                   )
                 ],
               ),

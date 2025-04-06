@@ -39,11 +39,11 @@ class _ProfilViewState extends State<ProfilView> {
               margin: EdgeInsetsDirectional.all(16),
               tiles: [
                 SettingsTile.navigation(
-                  title: Text('Mes commentaires'),
-                  description: Text('Permet de consulter ces commentaires'),
+                  title: Text('Mes avis'),
+                  description: Text('Permet de consulter ces avis'),
                   leading: Icon(Icons.comment),
                   onPressed: (_) {
-                    context.go('/profile/comments');
+                    context.go('/profile/avis');
                   },
                 ),
               ]
