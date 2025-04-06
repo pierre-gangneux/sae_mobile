@@ -116,7 +116,7 @@ class MyApp extends StatelessWidget {
                     builder: (context, state) => FavorisView(),
                   ),
                   GoRoute(
-                    path: 'comments',
+                    path: 'avis',
                     builder: (context, state) => AvisView(),
                   ),
                 ],
