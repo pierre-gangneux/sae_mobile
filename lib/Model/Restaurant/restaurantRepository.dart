@@ -154,5 +154,24 @@ class RestaurantRepository{
     return viewedOsmid;
   }
 
+  List<Restaurant> getRestaurantsInBounds({
+    required double minLatitude,
+    required double maxLatitude,
+    required double minLongitude,
+    required double maxLongitude,
+  }) {
+    return _lesRestaurants.where((restaurant) {
+      final double? latitude = double.tryParse(restaurant.latitude ?? '');
+      final double? longitude = double.tryParse(restaurant.longitude ?? '');
 
+      if (latitude == null || longitude == null) {
+        return false; // Skip restaurants with invalid coordinates
+      }
+
+      return latitude >= minLatitude &&
+          latitude <= maxLatitude &&
+          longitude >= minLongitude &&
+          longitude <= maxLongitude;
+    }).toList();
+  }
 }
