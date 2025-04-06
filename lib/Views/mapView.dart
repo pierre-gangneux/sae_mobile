@@ -142,7 +142,8 @@ class MapViewState extends State<MapView> {
                       ),
                     ),
                   );
-                }).toList(),
+                })
+                ],
               ),
             ],
           ),
