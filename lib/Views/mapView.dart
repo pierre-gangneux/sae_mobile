@@ -4,13 +4,15 @@ import 'package:latlong2/latlong.dart';
 import '../Model/Restaurant/Restaurant.dart'; // Adjust the import path as needed
 
 class MapView extends StatefulWidget {
+  const MapView({super.key});
+  
   @override
-  _MapViewState createState() => _MapViewState();
+  MapViewState createState() => MapViewState();
 }
 
-class _MapViewState extends State<MapView> {
+class MapViewState extends State<MapView> {
   // Sample list of restaurants
-  List<Restaurant> restaurants = [
+  final List<Restaurant> restaurants = [
     Restaurant(
       osmid: "1",
       nomRestaurant: "Restaurant A",
@@ -60,11 +62,15 @@ class _MapViewState extends State<MapView> {
                     point: LatLng(
                       double.parse(restaurant.latitude ?? "0"),
                       double.parse(restaurant.longitude ?? "0"),
-                    ),
-                    builder: (ctx) => Icon(
-                      Icons.location_pin,
-                      color: Colors.red,
-                      size: 30,
+                    ),                    child: Tooltip(
+                      message: restaurant.nomRestaurant,
+                      child: IconButton(
+                        icon: Icon(Icons.location_pin),
+                        onPressed: () {
+                          // Handle marker tap
+                          debugPrint("Tapped on ${restaurant.nomRestaurant}");
+                        },
+                      ),
                     ),
                   );
                 }).toList(),
@@ -77,7 +83,7 @@ class _MapViewState extends State<MapView> {
             child: Container(
               width: 200, // Adjust width as needed
               height: 300, // Adjust height as needed
-              color: Colors.white.withOpacity(0.9),
+              color: Colors.white.withValues(alpha: 0.8),
               child: ListView.builder(
                 itemCount: restaurants.length,
                 itemBuilder: (context, index) {
@@ -86,7 +92,7 @@ class _MapViewState extends State<MapView> {
                     subtitle: Text("${restaurants[index].type} - ${restaurants[index].etoiles}⭐"),
                     onTap: () {
                       // Handle restaurant tap
-                      print("Tapped on ${restaurants[index].nomRestaurant}");
+                      debugPrint("Tapped on ${restaurants[index].nomRestaurant}");
                     },
                   );
                 },
