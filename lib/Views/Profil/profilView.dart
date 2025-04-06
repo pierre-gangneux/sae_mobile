@@ -59,12 +59,13 @@ class _ProfilViewState extends State<ProfilView> {
             title: Text("Paramètres"),
             tiles: [
               SettingsTile.switchTile(
-                initialValue: themeViewModel.isDarkMode, // Use the current theme state
+                key: ValueKey(themeViewModel.isDarkMode), // 👈 force une clé différente selon le mode
+                initialValue: themeViewModel.isDarkMode,
                 title: const Text('Changer de thème'),
                 description: const Text("Basculer entre le mode clair et sombre"),
                 leading: const Icon(Icons.contrast),
                 onToggle: (_) {
-                  themeViewModel.toggleTheme(); // Toggle the theme
+                  themeViewModel.toggleTheme();
                 },
               ),
               SettingsTile(

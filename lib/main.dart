@@ -29,73 +29,74 @@ final GlobalKey<NavigatorState> _sectionANavigatorKey = GlobalKey<NavigatorState
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
   if (kIsWeb) {
     databaseFactory = databaseFactoryFfiWeb;
   }
-
   final database = await populateDatabase();
-
   runApp(MyApp(database: database));
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   final Database? database;
-
   const MyApp({super.key, required this.database});
 
   @override
-  Widget build(BuildContext context) {
-    return FutureBuilder<AuthState>(
-      future: _initAuthState(),
-      builder: (context, snapshot) {
-        if (!snapshot.hasData) {
-          return MaterialApp(
-            home: Scaffold(body: Center(child: CircularProgressIndicator())),
-          );
-        }
+  State<MyApp> createState() => _MyAppState();
+}
 
-        final authState = snapshot.data!;
+class _MyAppState extends State<MyApp> {
+  late final AuthState _authState;
+  GoRouter? _router;
 
-        return MultiProvider(
-          providers: [
-            ChangeNotifierProvider<AuthState>.value(value: authState),
-            ChangeNotifierProvider(create: (_) => RestaurantViewModel(database!)),
-            ChangeNotifierProvider(create: (_) => AvisViewModel(database!)),
-            ChangeNotifierProvider(
-              create: (context) {
-                final restaurantVM = Provider.of<RestaurantViewModel>(context, listen: false);
-                return LikeViewModel(database!, restaurantVM.restauRep);
-              },
-            ),
-            ChangeNotifierProvider(create: (context) => ThemeViewModel()),
-            ChangeNotifierProvider(create: (_) => CuisineViewModel(database!)),
-            ChangeNotifierProvider(create: (_) => ConnexionViewModel()),
-            ChangeNotifierProvider(create: (_) => ThemeViewModel()),
-          ],
-          child: Consumer<ThemeViewModel>(
-            builder: (context, themeViewModel, child) {
-              final router = createRouter(context.read<AuthState>(), context);
-              return MaterialApp.router(
-                title: 'SAE Mobile',
-                theme: themeViewModel.currentTheme,
-                routerConfig: router,
-              );
-            },
-          ),
-        );
-      },
-    );
+  @override
+  void initState() {
+    super.initState();
+    _authState = AuthState();
+    _initRouter();
   }
 
-  Future<AuthState> _initAuthState() async {
-    final authState = AuthState();
-    await authState.checkLoginStatus();
-    return authState;
+  Future<void> _initRouter() async {
+    await _authState.checkLoginStatus();
+    setState(() {
+      _router = createRouter(_authState);
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (_router == null) {
+      return MaterialApp(home: Scaffold(body: Center(child: CircularProgressIndicator())));
+    }
+
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider<AuthState>.value(value: _authState),
+        ChangeNotifierProvider(create: (_) => RestaurantViewModel(widget.database!)),
+        ChangeNotifierProvider(create: (_) => AvisViewModel(widget.database!)),
+        ChangeNotifierProvider(
+          create: (context) {
+            final restaurantVM = Provider.of<RestaurantViewModel>(context, listen: false);
+            return LikeViewModel(widget.database!, restaurantVM.restauRep);
+          },
+        ),
+        ChangeNotifierProvider(create: (_) => CuisineViewModel(widget.database!)),
+        ChangeNotifierProvider(create: (_) => ConnexionViewModel()),
+        ChangeNotifierProvider(create: (_) => ThemeViewModel()),
+      ],
+      child: Consumer<ThemeViewModel>(
+        builder: (context, themeViewModel, child) {
+          return MaterialApp.router(
+            title: 'SAE Mobile',
+            theme: themeViewModel.currentTheme,
+            routerConfig: _router!,
+          );
+        },
+      ),
+    );
   }
 }
 
-GoRouter createRouter(AuthState authState, BuildContext context) {
+GoRouter createRouter(AuthState authState) {
   return GoRouter(
     navigatorKey: _rootNavigatorKey,
     initialLocation: authState.isSignedIn ? '/home' : '/register',
@@ -112,7 +113,8 @@ GoRouter createRouter(AuthState authState, BuildContext context) {
     },
     routes: <RouteBase>[
       StatefulShellRoute.indexedStack(
-        builder: (context, state, navigationShell) => NavigBottom(navigationShell: navigationShell),
+        builder: (context, state, navigationShell) =>
+            NavigBottom(navigationShell: navigationShell),
         branches: <StatefulShellBranch>[
           StatefulShellBranch(
             navigatorKey: _sectionANavigatorKey,
@@ -135,11 +137,9 @@ GoRouter createRouter(AuthState authState, BuildContext context) {
                       final restaurantId = state.pathParameters['id']!;
                       final restaurantVM = Provider.of<RestaurantViewModel>(context, listen: false);
                       final restaurant = restaurantVM.getRestaurantById(restaurantId);
-
                       if (restaurant == null) {
                         return Scaffold(body: Center(child: Text('Restaurant non trouvé')));
                       }
-
                       return RestaurantDetailView(restaurant: restaurant);
                     },
                   ),
