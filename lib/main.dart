@@ -21,6 +21,7 @@ import 'Views/searchView.dart';
 import 'Views/mapView.dart';
 import 'database.dart';
 import 'ViewModels/restaurantViewModel.dart';
+import 'ViewModels/themeViewModel.dart';
 
 final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'root');
 final GlobalKey<NavigatorState> _sectionANavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'sectionANav');
@@ -166,6 +167,7 @@ class MyApp extends StatelessWidget {
         return MultiProvider(
           providers: [
             ChangeNotifierProvider(create: (context) => authState),
+            ChangeNotifierProvider(create: (context) => ThemeViewModel()),
             ChangeNotifierProvider(create: (context) => restaurantViewModel),
             ChangeNotifierProvider(create: (context) => AvisViewModel(database!)),
             ChangeNotifierProvider(
@@ -178,25 +180,11 @@ class MyApp extends StatelessWidget {
             ChangeNotifierProvider(create: (context) => CuisineViewModel(database!)),
             ChangeNotifierProvider(create: (context) => ConnexionViewModel()),
           ],
-          child: Consumer<RestaurantViewModel>(
-            builder: (context, restaurantViewModel, child) {
+          child: Consumer<ThemeViewModel>(
+            builder: (context, themeViewModel, child) {
               return MaterialApp.router(
                 title: 'SAE Mobile',
-                theme: ThemeData(
-                  primarySwatch: Colors.blue,
-                  bottomNavigationBarTheme: const BottomNavigationBarThemeData(
-                    backgroundColor: Colors.white,
-                    selectedItemColor: Colors.blue,
-                    unselectedItemColor: Colors.grey,
-                    elevation: 5,
-                  ),
-                  cardTheme: CardTheme(color: Colors.grey[600]),
-                  appBarTheme: const AppBarTheme(
-                    backgroundColor: Colors.blue,
-                    elevation: 0,
-                    titleTextStyle: TextStyle(color: Colors.white, fontSize: 20),
-                  ),
-                ),
+                theme: themeViewModel.currentTheme,
                 routerConfig: _router,
               );
             },
