@@ -10,6 +10,8 @@ SAE Mobile est une application mobile développée avec Flutter, conçue pour of
 - DEVERS-DORE Lucas
 - PAVARD Arthur
 
+---
+
 ## Fonctionnalités
 
 - **Carte interactive** :
